@@ -7,21 +7,32 @@
    CONDITIONS OF ANY KIND, either express or implied.
 */
 
+#include "App.h"
+//#include "smooth/core/Application.h"
+#include "smooth/core/SystemStatistics.h"
+
+
+//using namespace app;
+
+using namespace start;
 
 extern "C"
 {
 #ifdef ESP_PLATFORM
 void app_main()
 {
-   
+    App app;
+    app.start();
 }
 #else
     int main(int /*argc*/, char** /*argv*/)
     {
-        //App app{};
-        //app.start();
+        smooth::core::SystemStatistics::instance().dump();
+        App app{};
+        app.start();
         return 0;
     }
 #endif
     
 }
+
