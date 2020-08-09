@@ -11,7 +11,6 @@
 //#include "smooth/core/Application.h"
 #include "smooth/core/SystemStatistics.h"
 
-
 //using namespace app;
 
 using namespace start;
@@ -19,13 +18,13 @@ using namespace start;
 extern "C"
 {
 #ifdef ESP_PLATFORM
-void app_main()
-{
-    App app;
-    app.start();
-}
+    void app_main()
+    {
+        App app;
+        app.start();
+    }
 #else
-    int main(int /*argc*/, char** /*argv*/)
+    int main(int /*argc*/, char ** /*argv*/)
     {
         smooth::core::SystemStatistics::instance().dump();
         App app{};
@@ -33,6 +32,4 @@ void app_main()
         return 0;
     }
 #endif
-    
 }
-

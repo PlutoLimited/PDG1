@@ -1,0 +1,5 @@
+{
+    "cmake.configureOnOpen": false,
+    "idf.espIdfPathWin": "d:\\Projects\\ESP_IDF",
+    "idf.customExtraPaths": "d:\\Projects\\ESP_IDF_TOOLS\\.espressif\\python_env\\idf4.3_py3.8_env\\Scripts;C:\\Users\\Alter\\AppData\\Local\\Programs\\Python;d:\\ESP_IDF\\TOOLS\\tools\\xtensa-esp32-elf\\esp-2020r2-8.2.0\\xtensa-esp32-elf\\bin;d:\\ESP_IDF\\TOOLS\\tools\\xtensa-esp32s2-elf\\esp-2020r2-8.2.0\\xtensa-esp32s2-elf\\bin;d:\\ESP_IDF\\TOOLS\\tools\\esp32ulp-elf\\2.28.51-esp-20191205\\esp32ulp-elf-binutils\\bin;d:\\ESP_IDF\\TOOLS\\tools\\esp32s2ulp-elf\\2.28.51-esp-20191205\\esp32s2ulp-elf-binutils\\bin;d:\\ESP_IDF\\TOOLS\\tools\\cmake\\3.16.4\\bin;d:\\ESP_IDF\\TOOLS\\tools\\openocd-esp32\\v0.10.0-esp32-20200709\\openocd-esp32\\bin;d:\\ESP_IDF\\TOOLS\\tools\\ninja\\1.10.0;d:\\ESP_IDF\\TOOLS\\tools\\idf-exe\\1.0.1;d:\\ESP_IDF\\TOOLS\\tools\\ccache\\3.7;d:\\ESP_IDF\\TOOLS\\tools\\dfu-util\\0.9\\dfu-util-0.9-win64"
+}
