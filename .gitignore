@@ -30,9 +30,11 @@
 *.exe
 *.out
 *.app
+*.mk
 
 build
 cmake-build-*
 sdkconfig.old
 generated_test_smooth_*
 .idea/.name
+Makefile

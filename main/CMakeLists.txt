@@ -4,16 +4,11 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(SOURCES main.cpp App.cpp App.h)
 
-if(${ESP_PLATFORM})
+file(TO_CMAKE_PATH "$ENV{IDF_PATH}" normalized_path)
+
     idf_component_register(SRCS ${SOURCES}
                             INCLUDE_DIRS
                                 ${CMAKE_CURRENT_LIST_DIR}
-                                $ENV{IDF_PATH}/components
+                                ${normalized_path}/components
                             REQUIRES
                                 smooth_component)
-else()
-    project(your_project_name.elf)
-    add_executable(${PROJECT_NAME} ${SOURCES})
-    target_link_libraries(${PROJECT_NAME} smooth pthread)
-    target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR})
-endif()

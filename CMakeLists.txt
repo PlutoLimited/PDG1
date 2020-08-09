@@ -1,5 +1,4 @@
-# The following lines of boilerplate have to be in your project's
-# CMakeLists in this exact order for cmake to work correctly
+
 cmake_minimum_required(VERSION 3.10)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -10,16 +9,9 @@ include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 # Include Smooth as a component
 set(EXTRA_COMPONENT_DIRS
          externals/smooth/smooth_component)
+project(PDG1 1.0)
 
-project(hello-world)
+
 else()
-    if(${APPLE})
-        include_directories(SYSTEM /usr/local/include)
-        link_directories(/usr/local/lib)
-    endif()
-
-
-    add_subdirectory(main)
-    add_subdirectory(externals/smooth/lib)
-    add_subdirectory(externals/smooth/mock-idf)
+   # Empty project when not building for ESP (i.e. when loading the project into an IDE with already configured tool chains for native Linux)
 endif()
