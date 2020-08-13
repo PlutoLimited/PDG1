@@ -33,6 +33,7 @@
 *.mk
 
 build
+.vscode
 cmake-build-*
 sdkconfig.old
 generated_test_smooth_*
