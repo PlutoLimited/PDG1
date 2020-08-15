@@ -9,6 +9,6 @@ file(TO_CMAKE_PATH "$ENV{IDF_PATH}" normalized_path)
     idf_component_register(SRCS ${SOURCES}
                             INCLUDE_DIRS
                                 ${CMAKE_CURRENT_LIST_DIR}
-                                ${normalized_path}/components
                             REQUIRES
-                                smooth_component)
+                                smooth_component
+                                components)

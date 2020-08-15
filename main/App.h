@@ -19,16 +19,22 @@ limitations under the License.
 
 #include "smooth/core/Application.h"
 #include "smooth/core/task_priorities.h"
+#include "llc.h"
 #include <iostream>
-namespace start
+namespace os
 {
+    static const std::string G_APP_TAG("[OS]");
     class App : public smooth::core::Application
     {
     public:
         App();
-        
+
         void init() override;
-        
+
         void tick() override;
+
+    private:
+        task::LLCTask m_LLCtask;
     };
-}
+
+} // namespace os

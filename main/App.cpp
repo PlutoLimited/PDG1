@@ -20,39 +20,22 @@ limitations under the License.
 #include "smooth/core/task_priorities.h"
 #include "smooth/core/SystemStatistics.h"
 
-using namespace smooth::core;
-
-
-namespace start
+namespace os
 {
-    class ATask : public smooth::core::Task
-    {
-    public:
-        ATask() : smooth::core::Task("Other task", 9000, APPLICATION_BASE_PRIO, std::chrono::seconds{ 1 })
-        {}
-        
-        void tick() override
-        {
-            Log::info("App::Init", "Hello from other task");
-        }
-    };
-    
-    ATask a_instance{};
-    
+
     App::App()
-    : Application(smooth::core::APPLICATION_BASE_PRIO, std::chrono::seconds(3))
+        : Application(smooth::core::APPLICATION_BASE_PRIO, std::chrono::seconds(5U))
     {
     }
-    
+
     void App::init()
     {
-        Log::info("App::Init", "Starting...");
-        a_instance.start();
+        Log::info(G_APP_TAG, "Init Application...");
     }
-    
+
     void App::tick()
     {
-        Log::info("App", "Hello world!");
-        SystemStatistics::instance().dump();
+        Log::info(G_APP_TAG, "Tick");
+        smooth::core::SystemStatistics::instance().dump();
     }
-}
+} // namespace os
