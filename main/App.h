@@ -20,10 +20,13 @@ limitations under the License.
 #include "smooth/core/Application.h"
 #include "smooth/core/task_priorities.h"
 #include "llc.h"
+#include "tic.h"
+#include "ledc.h"
 #include <iostream>
 namespace os
 {
     static const std::string G_APP_TAG("[OS]");
+
     class App : public smooth::core::Application
     {
     public:
@@ -34,7 +37,9 @@ namespace os
         void tick() override;
 
     private:
-        task::LLCTask m_LLCtask;
+        tasks::llc::LLCTask m_LLCtask;
+        tasks::tic::TICTask m_TICtask;
+        tasks::ledc::LEDCTask m_LEDCtask;
     };
 
 } // namespace os

@@ -24,13 +24,16 @@ namespace os
 {
 
     App::App()
-        : Application(smooth::core::APPLICATION_BASE_PRIO, std::chrono::seconds(5U))
+        : Application(smooth::core::APPLICATION_BASE_PRIO, std::chrono::seconds(5U)), m_LLCtask(), m_TICtask(), m_LEDCtask()
     {
     }
 
     void App::init()
     {
-        Log::info(G_APP_TAG, "Init Application...");
+        Log::info(G_APP_TAG, "Init Application Tasks");
+        m_LLCtask.start();
+        m_TICtask.start();
+        m_LEDCtask.start();
     }
 
     void App::tick()
