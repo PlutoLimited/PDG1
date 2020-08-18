@@ -1,8 +1,10 @@
 #pragma once
 
-#include "base/runnable.h"
+#include "runnable.h"
 #include "memport.h"
 #include "smooth/core/Application.h"
+#include "output/llc_output.h"
+
 namespace runnable
 {
     namespace llc
@@ -20,11 +22,16 @@ namespace runnable
             void run() override
             {
                 //collect input
-                if (m_osInputPort->hasData())
-                {
-                    Log::info(G_TASK_TAG, "OS Input Port has data");
-                }
 
+                if (!m_osInputPort->hasData())
+                {
+                    Log::info(G_TASK_TAG, "OS Input Port is nullptr");
+                    return;
+                }
+                m_output.m_int = m_output.m_int + 1;
+                m_output.m_string = m_output.m_string;
+                m_llcOutputPort->setData(m_output);
+                //Log::info(G_TASK_TAG, "set: " + m_llcOutputPort->getData()->m_string);
                 //run algo
                 //set output
             }
@@ -36,7 +43,7 @@ namespace runnable
                 m_ticInputPort = f_ticInputPort;
             }
 
-            void attachOutputPorts(tinymemport::TDataPort<std::string> *f_llcOutputPort)
+            void attachOutputPorts(tinymemport::TDataPort<runnable::llc::llc_output> *f_llcOutputPort)
             {
                 Log::info(G_TASK_TAG, "Attaching output ports");
                 m_llcOutputPort = f_llcOutputPort;
@@ -45,7 +52,12 @@ namespace runnable
         private:
             tinymemport::TDataPort<std::string> *m_osInputPort;
             tinymemport::TDataPort<std::string> *m_ticInputPort;
-            tinymemport::TDataPort<std::string> *m_llcOutputPort;
+            tinymemport::TDataPort<runnable::llc::llc_output> *m_llcOutputPort;
+
+            runnable::llc::llc_output m_output;
+            void collectInput();
+            void doWork();
+            void sendOutput();
         };
     } // namespace llc
 } // namespace runnable

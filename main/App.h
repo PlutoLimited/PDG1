@@ -20,6 +20,7 @@ limitations under the License.
 #include "smooth/core/Application.h"
 #include "smooth/core/task_priorities.h"
 #include "llc.h"
+#include "output/llc_output.h"
 #include "tic.h"
 #include "ledc.h"
 #include "memport.h"
@@ -39,7 +40,7 @@ namespace os
 
     private:
         tinymemport::TDataPort<std::string> m_osOutputData;
-        tinymemport::TDataPort<std::string> m_llcOutputData;
+        tinymemport::TDataPort<runnable::llc::llc_output> m_llcOutputData;
         tinymemport::TDataPort<std::string> m_ledcOutputData;
         tinymemport::TDataPort<std::string> m_ticOutputData;
 

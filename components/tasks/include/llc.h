@@ -3,6 +3,7 @@
 #include "smooth/core/Application.h"
 #include "smooth/core/task_priorities.h"
 #include "llcRunnable.h"
+#include "output/llc_output.h"
 #include "memport.h"
 #include <iostream>
 
@@ -25,7 +26,7 @@ namespace tasks
                 m_ticInputPort = f_ticInputPort;
             }
 
-            void attachOutputDataPorts(tinymemport::TDataPort<std::string> *f_llcOutputPort)
+            void attachOutputDataPorts(tinymemport::TDataPort<runnable::llc::llc_output> *f_llcOutputPort)
             {
                 m_llcOutputPort = f_llcOutputPort;
             }
@@ -45,7 +46,7 @@ namespace tasks
         private:
             tinymemport::TDataPort<std::string> *m_osInputPort;
             tinymemport::TDataPort<std::string> *m_ticInputPort;
-            tinymemport::TDataPort<std::string> *m_llcOutputPort;
+            tinymemport::TDataPort<runnable::llc::llc_output> *m_llcOutputPort;
 
             runnable::llc::CLLCRunnable m_llcRunnable;
         };
