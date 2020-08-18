@@ -14,6 +14,6 @@ file(TO_CMAKE_PATH "$ENV{IDF_PATH}" normalized_path)
                                 tasks)
 
 # Create and import the library targets
-add_subdirectory( ${CMAKE_CURRENT_LIST_DIR}/../externals/tiny-mempool-lib build)
+add_subdirectory( ${CMAKE_CURRENT_LIST_DIR}/../externals/tinymemport build)
 # Publicly link `tiny_mempool_lib` to `main` component
-target_link_libraries(${COMPONENT_LIB} PUBLIC tiny_mempool_lib)
+target_link_libraries(${COMPONENT_LIB} PUBLIC tiny_memport)

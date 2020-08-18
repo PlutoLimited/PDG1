@@ -22,7 +22,7 @@ limitations under the License.
 #include "llc.h"
 #include "tic.h"
 #include "ledc.h"
-#include "mempool.h"
+#include "memport.h"
 #include <iostream>
 namespace os
 {
@@ -38,10 +38,10 @@ namespace os
         void tick() override;
 
     private:
-        tinydataportlib::TDataPort<std::string> m_osOutputData;
-        tinydataportlib::TDataPort<std::string> m_llcOutputData;
-        tinydataportlib::TDataPort<std::string> m_ledcOutputData;
-        tinydataportlib::TDataPort<std::string> m_ticOutputData;
+        tinymemport::TDataPort<std::string> m_osOutputData;
+        tinymemport::TDataPort<std::string> m_llcOutputData;
+        tinymemport::TDataPort<std::string> m_ledcOutputData;
+        tinymemport::TDataPort<std::string> m_ticOutputData;
 
         tasks::llc::LLCTask m_LLCtask;
         tasks::tic::TICTask m_TICtask;
