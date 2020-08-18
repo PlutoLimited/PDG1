@@ -2,3 +2,6 @@
 	path = externals/smooth
 	url = https://github.com/PlutoLimited/Smooth.git
 
+[submodule "externals/tinymemport"]
+	path = externals/tinymemport
+	url = https://github.com/PlutoLimited/tinymemport.git
