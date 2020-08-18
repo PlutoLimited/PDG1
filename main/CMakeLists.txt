@@ -12,3 +12,8 @@ file(TO_CMAKE_PATH "$ENV{IDF_PATH}" normalized_path)
                             REQUIRES
                                 smooth_component
                                 tasks)
+
+# Create and import the library targets
+add_subdirectory( ${CMAKE_CURRENT_LIST_DIR}/../externals/tiny-mempool-lib build)
+# Publicly link `tiny_mempool_lib` to `main` component
+target_link_libraries(${COMPONENT_LIB} PUBLIC tiny_mempool_lib)

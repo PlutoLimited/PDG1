@@ -24,14 +24,18 @@ namespace os
 {
 
     App::App()
-        : Application(smooth::core::APPLICATION_BASE_PRIO, std::chrono::seconds(5U)), m_LLCtask(), m_TICtask(), m_LEDCtask()
+        : Application(smooth::core::APPLICATION_BASE_PRIO, std::chrono::seconds(5U)), m_osOutputData(), m_llcOutputData(), m_ledcOutputData(), m_ticOutputData(), m_LLCtask(), m_TICtask(), m_LEDCtask()
     {
     }
 
     void App::init()
     {
         Log::info(G_APP_TAG, "Init Application Tasks");
+
+        m_LLCtask.attachInputDataPorts(&m_osOutputData, &m_ticOutputData);
+        m_LLCtask.attachOutputDataPorts(&m_llcOutputData);
         m_LLCtask.start();
+
         m_TICtask.start();
         m_LEDCtask.start();
     }

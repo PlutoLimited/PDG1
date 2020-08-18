@@ -25,7 +25,6 @@ namespace tasks
 
             void tick() override
             {
-                Log::info(G_TASK_TAG, "Hello from TIC task");
             }
         };
     } // namespace tic
