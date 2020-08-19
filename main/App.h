@@ -20,7 +20,6 @@ limitations under the License.
 #include "smooth/core/Application.h"
 #include "smooth/core/task_priorities.h"
 #include "llc.h"
-#include "output/llc_output.h"
 #include "tic.h"
 #include "ledc.h"
 #include "memport.h"
@@ -29,20 +28,26 @@ namespace os
 {
     static const std::string G_APP_TAG("[OS]");
 
+    using ticPort = tinymemport::TDataPort<runnable::tic::CTicOutput>;
+    using llcPort = tinymemport::TDataPort<runnable::llc::CLlcOutput>;
+    using ledcPort = tinymemport::TDataPort<runnable::ledc::CLedcOutput>;
+
     class App : public smooth::core::Application
     {
     public:
-        App();
+        App()
+            : Application(smooth::core::APPLICATION_BASE_PRIO, std::chrono::seconds(20U)), m_llcOutputData(), m_ledcOutputData(), m_ticOutputData(), m_LLCtask(), m_TICtask(), m_LEDCtask()
+        {
+        }
 
         void init() override;
 
         void tick() override;
 
     private:
-        tinymemport::TDataPort<std::string> m_osOutputData;
-        tinymemport::TDataPort<runnable::llc::llc_output> m_llcOutputData;
-        tinymemport::TDataPort<std::string> m_ledcOutputData;
-        tinymemport::TDataPort<std::string> m_ticOutputData;
+        llcPort m_llcOutputData;
+        ledcPort m_ledcOutputData;
+        ticPort m_ticOutputData;
 
         tasks::llc::LLCTask m_LLCtask;
         tasks::tic::TICTask m_TICtask;

@@ -4,6 +4,7 @@
 #include "memport.h"
 #include "smooth/core/Application.h"
 #include "output/llc_output.h"
+#include "output/tic_output.h"
 
 namespace runnable
 {
@@ -11,50 +12,29 @@ namespace runnable
     {
 
         static const std::string G_TASK_TAG("[RUN::LLC]");
+
+        using ticPort_p = tinymemport::TDataPort<runnable::tic::CTicOutput> *;
+        using llcPort_p = tinymemport::TDataPort<runnable::llc::CLlcOutput> *;
+
         class CLLCRunnable : public CRunnable
         {
         public:
-            CLLCRunnable()
+            CLLCRunnable() : m_ticInputPort(), m_llcOutputPort(), m_output()
             {
             }
 
-            void init() override {}
-            void run() override
-            {
-                //collect input
+            void init() override;
+            void run() override;
 
-                if (!m_osInputPort->hasData())
-                {
-                    Log::info(G_TASK_TAG, "OS Input Port is nullptr");
-                    return;
-                }
-                m_output.m_int = m_output.m_int + 1;
-                m_output.m_string = m_output.m_string;
-                m_llcOutputPort->setData(m_output);
-                //Log::info(G_TASK_TAG, "set: " + m_llcOutputPort->getData()->m_string);
-                //run algo
-                //set output
-            }
-
-            void attachInputPorts(tinymemport::TDataPort<std::string> *f_osInputPort, tinymemport::TDataPort<std::string> *f_ticInputPort)
-            {
-                Log::info(G_TASK_TAG, "Attaching input ports");
-                m_osInputPort = f_osInputPort;
-                m_ticInputPort = f_ticInputPort;
-            }
-
-            void attachOutputPorts(tinymemport::TDataPort<runnable::llc::llc_output> *f_llcOutputPort)
-            {
-                Log::info(G_TASK_TAG, "Attaching output ports");
-                m_llcOutputPort = f_llcOutputPort;
-            }
+            void attachInputPorts(ticPort_p f_ticInputPort);
+            void attachOutputPorts(llcPort_p f_llcOutputPort);
 
         private:
-            tinymemport::TDataPort<std::string> *m_osInputPort;
-            tinymemport::TDataPort<std::string> *m_ticInputPort;
-            tinymemport::TDataPort<runnable::llc::llc_output> *m_llcOutputPort;
+            ticPort_p m_ticInputPort;
+            llcPort_p m_llcOutputPort;
 
-            runnable::llc::llc_output m_output;
+            runnable::llc::CLlcOutput m_output;
+
             void collectInput();
             void doWork();
             void sendOutput();

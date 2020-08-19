@@ -6,14 +6,27 @@ namespace runnable
 {
     namespace llc
     {
+        enum class ELLCState
+        {
+            INACTIVE = 0,
+            ACTIVE,
+            DEGRADED
+        };
 
-        class llc_output
+        enum class ELightState
+        {
+            LIGHT_OFF = 0,
+            LIGHT_DIM,
+            LIGHT_FULL_ON
+        };
+
+        class CLlcOutput
         {
         public:
-            llc_output() : m_int(0U), m_string(""){};
-            //   ~llc_output() {}
-            uint64_t m_int = 0U;
-            std::string m_string = "";
+            CLlcOutput() : m_funcState(ELLCState::INACTIVE), m_lightState(ELightState::LIGHT_OFF), m_dimLevel(0U){};
+            ELLCState m_funcState;
+            ELightState m_lightState;
+            uint8_t m_dimLevel;
         };
 
     } // namespace llc

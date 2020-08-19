@@ -23,26 +23,25 @@ limitations under the License.
 namespace os
 {
 
-    App::App()
-        : Application(smooth::core::APPLICATION_BASE_PRIO, std::chrono::seconds(5U)), m_osOutputData(), m_llcOutputData(), m_ledcOutputData(), m_ticOutputData(), m_LLCtask(), m_TICtask(), m_LEDCtask()
-    {
-    }
-
     void App::init()
     {
         Log::info(G_APP_TAG, "Init Application Tasks");
 
-        m_LLCtask.attachInputDataPorts(&m_osOutputData, &m_ticOutputData);
+        m_LLCtask.attachInputDataPorts(&m_ticOutputData);
         m_LLCtask.attachOutputDataPorts(&m_llcOutputData);
         m_LLCtask.start();
 
+        m_TICtask.attachInputDataPorts();
+        m_TICtask.attachOutputDataPorts(&m_ticOutputData);
         m_TICtask.start();
+
+        m_LEDCtask.attachInputDataPorts(&m_llcOutputData, &m_ticOutputData);
+        m_LEDCtask.attachOutputDataPorts(&m_ledcOutputData);
         m_LEDCtask.start();
     }
 
     void App::tick()
     {
-        Log::info(G_APP_TAG, "Tick");
         smooth::core::SystemStatistics::instance().dump();
     }
 } // namespace os
