@@ -22,7 +22,8 @@ class CLLCRunnable : public CRunnable {
         m_llcOutputPort(),
         m_inputData(),
         m_output(),
-        m_prevOutput() {}
+        m_prevOutput(),
+        m_hwDelegate() {}
 
   void init() override;
   void run() override;

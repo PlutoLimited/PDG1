@@ -10,7 +10,7 @@ namespace hw {
 static const auto G_PIN_EN = GPIO_NUM_4;
 static const auto G_PIN_PWM = GPIO_NUM_2;
 
-static const uint16_t G_LOOKUP_DIM_TABLE[100] = {
+static const uint32_t G_LOOKUP_DIM_TABLE[100] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

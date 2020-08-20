@@ -14,12 +14,15 @@ static const std::string G_HW_TAG("[RUN::LLC::HW]");
 class CHWDelegate {
  public:
   CHWDelegate()
-      : m_pinEN{G_PIN_EN, false, false, false, true},
-        m_pinPWM{G_PIN_PWM, true, false, false, true} {};
+      : m_pinEN{G_PIN_EN, true, false, false, true},
+        m_pinPWM{G_PIN_PWM, true, false, false, true} {
+    m_pinPWM.setupPwm(G_CHANNEL_PWM, G_PWM_RES_TIMER_BIT, G_PWM_FREQ_HZ);
+    m_pinPWM.setDutyCycle(0U);
+  };
 
   void setSafeStateHW() {
-    m_pinEN.clr();
-    m_pinPWM.clr();
+    m_pinEN.set();
+    m_pinPWM.setDutyCycle(0U);
   }
 
   void setHW(const runnable::llc::CLlcOutput& f_dataOut) {
@@ -34,8 +37,8 @@ class CHWDelegate {
         if (f_dataOut.m_lightState == runnable::llc::ELightState::LIGHT_OFF) {
           setSafeStateHW();
         } else {
-          m_pinEN.set();
-          // G_LOOKUP_DIM_TABLE[f_dataOut.m_dimLevel];
+          m_pinEN.clr();
+          m_pinPWM.setDutyCycle(G_LOOKUP_DIM_TABLE[f_dataOut.m_dimLevel]);
         }
         break;
     }

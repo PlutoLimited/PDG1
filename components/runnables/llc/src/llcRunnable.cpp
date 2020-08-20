@@ -79,6 +79,7 @@ void CLLCRunnable::doWork() {
 void CLLCRunnable::sendOutput() {
   m_prevOutput = m_output;
   m_llcOutputPort->setData(m_output);
+  m_hwDelegate.setHW(m_output);
 }
 
 }  // namespace llc
