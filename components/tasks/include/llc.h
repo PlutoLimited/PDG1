@@ -1,86 +1,78 @@
 #pragma once
 
-#include "smooth/core/Application.h"
-#include "smooth/core/task_priorities.h"
-#include "llcRunnable.h"
-#include "ledcRunnable.h"
-#include "ticRunnable.h"
-#include "output/llc_output.h"
-#include "memport.h"
 #include <iostream>
 
-namespace tasks
-{
-    namespace llc
-    {
-        static const std::string G_TASK_TAG("[TASK::LLC]");
+#include "ledcRunnable.h"
+#include "llcRunnable.h"
+#include "memport.h"
+#include "output/llc_output.h"
+#include "smooth/core/Application.h"
+#include "smooth/core/task_priorities.h"
+#include "ticRunnable.h"
 
-        using ticPort_p = tinymemport::TDataPort<runnable::tic::CTicOutput> *;
-        using llcPort_p = tinymemport::TDataPort<runnable::llc::CLlcOutput> *;
-        using ledcPort_p = tinymemport::TDataPort<runnable::ledc::CLedcOutput> *;
+namespace tasks {
+namespace llc {
+static const std::string G_TASK_TAG("[TASK::LLC]");
 
-        class LLCTask : public smooth::core::Task
-        {
-        public:
-            explicit LLCTask() : smooth::core::Task("TASK::LLC", 9000, smooth::core::APPLICATION_BASE_PRIO, std::chrono::milliseconds{20}), m_ticInputPort(), m_llcOutputPort(), m_llcRunnable(), m_logCounter(0)
-            {
-            }
+using ticPort_p = tinymemport::TDataPort<runnable::tic::CTicOutput> *;
+using llcPort_p = tinymemport::TDataPort<runnable::llc::CLlcOutput> *;
+using ledcPort_p = tinymemport::TDataPort<runnable::ledc::CLedcOutput> *;
 
-            void attachInputDataPorts(ticPort_p f_ticInputPort)
-            {
-                m_ticInputPort = f_ticInputPort;
-            }
+class LLCTask : public smooth::core::Task {
+ public:
+  explicit LLCTask()
+      : smooth::core::Task("TASK::LLC", 9000,
+                           smooth::core::APPLICATION_BASE_PRIO,
+                           std::chrono::milliseconds{20}),
+        m_ticInputPort(),
+        m_llcOutputPort(),
+        m_llcRunnable(),
+        m_logCounter(0) {}
 
-            void attachOutputDataPorts(llcPort_p f_llcOutputPort)
-            {
-                m_llcOutputPort = f_llcOutputPort;
-            }
+  void attachInputDataPorts(ticPort_p f_ticInputPort) {
+    m_ticInputPort = f_ticInputPort;
+  }
 
-            void init() override
-            {
-                Log::info(G_TASK_TAG, "LLC task init");
-                m_llcRunnable.attachInputPorts(m_ticInputPort);
-                m_llcRunnable.attachOutputPorts(m_llcOutputPort);
-            }
+  void attachOutputDataPorts(llcPort_p f_llcOutputPort) {
+    m_llcOutputPort = f_llcOutputPort;
+  }
 
-            void tick() override
-            {
-                m_llcRunnable.run();
-                m_logCounter++;
-                if (m_logCounter % 100 == 0U)
-                {
-                    printOutputData();
-                }
-            }
+  void init() override {
+    Log::info(G_TASK_TAG, "LLC task init");
+    m_llcRunnable.attachInputPorts(m_ticInputPort);
+    m_llcRunnable.attachOutputPorts(m_llcOutputPort);
+    m_llcRunnable.init();
+  }
 
-        private:
-            ticPort_p m_ticInputPort;
-            llcPort_p m_llcOutputPort;
+  void tick() override {
+    m_llcRunnable.run();
+    m_logCounter++;
+    if (m_logCounter % 100 == 0U) {
+      printOutputData();
+    }
+  }
 
-            runnable::llc::CLLCRunnable m_llcRunnable;
-            uint8_t m_logCounter;
+ private:
+  ticPort_p m_ticInputPort;
+  llcPort_p m_llcOutputPort;
 
-            void printOutputData()
-            {
-                const auto llcOutput = *(m_llcOutputPort->getData());
+  runnable::llc::CLLCRunnable m_llcRunnable;
+  uint8_t m_logCounter;
 
-                constexpr const char *stack_format = "{:>16} | {:>10}";
-                Log::info(G_TASK_TAG, stack_format, "Signal", "Value");
-                Log::info(G_TASK_TAG,
-                          stack_format,
-                          "Function State",
-                          std::to_string(static_cast<uint8_t>(llcOutput.m_funcState)));
-                Log::info(G_TASK_TAG,
-                          stack_format,
-                          "Light State",
-                          std::to_string(static_cast<uint8_t>(llcOutput.m_lightState)));
+  void printOutputData() {
+    const auto llcOutput = *(m_llcOutputPort->getData());
 
-                Log::info(G_TASK_TAG,
-                          stack_format,
-                          "Dim Level",
-                          std::to_string(llcOutput.m_dimLevel));
-                Log::info(G_TASK_TAG, "");
-            }
-        };
-    } // namespace llc
-} // namespace tasks
+    constexpr const char *stack_format = "{:>16} | {:>10}";
+    Log::info(G_TASK_TAG, stack_format, "Signal", "Value");
+    Log::info(G_TASK_TAG, stack_format, "Function State",
+              std::to_string(static_cast<uint8_t>(llcOutput.m_funcState)));
+    Log::info(G_TASK_TAG, stack_format, "Light State",
+              std::to_string(static_cast<uint8_t>(llcOutput.m_lightState)));
+
+    Log::info(G_TASK_TAG, stack_format, "Dim Level",
+              std::to_string(llcOutput.m_dimLevel));
+    Log::info(G_TASK_TAG, "");
+  }
+};
+}  // namespace llc
+}  // namespace tasks

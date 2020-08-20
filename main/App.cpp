@@ -16,32 +16,28 @@ limitations under the License.
 */
 
 #include "App.h"
+
+#include "smooth/core/SystemStatistics.h"
 #include "smooth/core/Task.h"
 #include "smooth/core/task_priorities.h"
-#include "smooth/core/SystemStatistics.h"
 
-namespace os
-{
+namespace os {
 
-    void App::init()
-    {
-        Log::info(G_APP_TAG, "Init Application Tasks");
+void App::init() {
+  Log::info(G_APP_TAG, "Init Application Tasks");
 
-        m_LLCtask.attachInputDataPorts(&m_ticOutputData);
-        m_LLCtask.attachOutputDataPorts(&m_llcOutputData);
-        m_LLCtask.start();
+  m_LLCtask.attachInputDataPorts(&m_ticOutputData);
+  m_LLCtask.attachOutputDataPorts(&m_llcOutputData);
+  m_LLCtask.start();
 
-        m_TICtask.attachInputDataPorts();
-        m_TICtask.attachOutputDataPorts(&m_ticOutputData);
-        m_TICtask.start();
+  m_TICtask.attachInputDataPorts();
+  m_TICtask.attachOutputDataPorts(&m_ticOutputData);
+  m_TICtask.start();
 
-        m_LEDCtask.attachInputDataPorts(&m_llcOutputData, &m_ticOutputData);
-        m_LEDCtask.attachOutputDataPorts(&m_ledcOutputData);
-        m_LEDCtask.start();
-    }
+  m_LEDCtask.attachInputDataPorts(&m_llcOutputData, &m_ticOutputData);
+  m_LEDCtask.attachOutputDataPorts(&m_ledcOutputData);
+  m_LEDCtask.start();
+}
 
-    void App::tick()
-    {
-        smooth::core::SystemStatistics::instance().dump();
-    }
-} // namespace os
+void App::tick() { smooth::core::SystemStatistics::instance().dump(); }
+}  // namespace os
