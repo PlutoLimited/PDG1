@@ -47,7 +47,7 @@ void CLLCRunnable::doWork() {
     case runnable::tic::ETICState::ACTIVE:
       // set llc output
       if (m_inputData.m_deviceState ==
-          runnable::tic::EDeviceState::DEVICE_ACTIVE) {
+          runnable::tic::EDeviceState::DEVICE_ACTIVE_CONFIGURED) {
         if (m_inputData.m_touchInteraction ==
                 runnable::tic::ETouchInteraction::SLIDING_DETECTED ||
             m_inputData.m_touchInteraction ==

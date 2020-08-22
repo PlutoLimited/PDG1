@@ -24,6 +24,8 @@ limitations under the License.
 namespace os {
 
 void App::init() {
+  Application::init();
+
   Log::info(G_APP_TAG, "Init Application Tasks");
 
   m_LLCtask.attachInputDataPorts(&m_ticOutputData);
