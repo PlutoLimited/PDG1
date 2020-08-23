@@ -33,17 +33,30 @@ class CIQS263DeviceHandler {
     m_touchDevice = m_i2c_master.create_device<hw::IQS263B>(hw::G_IQS263_ADDR);
   }
 
-  void configureDevice() {
+  void checkDeviceAvailability() {
     m_deviceAvailable = m_touchDevice->is_present();
+    if (m_deviceAvailable) {
+      Log::info(G_TASK_TAG, "IQS263B Device available");
+    } else {
+      Log::error(G_TASK_TAG, "IQS263B Device NOT available");
+    }
+  }
+  void configureDevice() {
     if (m_deviceAvailable) {
       Log::info(G_TASK_TAG,
                 "IQS263B Device available --- Attempting Initialization...");
     } else {
       Log::error(G_TASK_TAG,
                  "IQS263B Device NOT available --- Aborting Configuration");
+      return;
     }
 
     m_deviceConfigured = m_touchDevice->configure_device();
+
+    if (m_deviceConfigured) {
+      m_deviceConfigured = m_touchDevice->clr_reset_bit();
+    }
+
     if (m_deviceConfigured) {
       Log::info(G_TASK_TAG, "IQS263B intialization --- {}",
                 m_deviceConfigured ? "Succeeded" : "Failed");
@@ -64,9 +77,10 @@ class CIQS263DeviceHandler {
       return;
     }
     if (!m_deviceConfigured) {
-      m_deviceConfigured = m_touchDevice->configure_device();
+      configureDevice();
+
       m_output.m_funcState = ETICState::INACTIVE;
-      m_output.m_deviceState = (EDeviceState::DEVICE_NOT_PRESENT),
+      m_output.m_deviceState = (EDeviceState::DEVICE_ACTIVE_NOT_CONF),
       m_output.m_touchInteraction = (ETouchInteraction::NO_INTERACTION),
       m_output.m_coordinateState = (ESliderCoordinates::NOT_AVAILABLE),
       m_output.m_sliderLevel = (0U);
@@ -78,6 +92,11 @@ class CIQS263DeviceHandler {
     CSystemFlagsEventsData sysEventData;
 
     if (m_touchDevice->read_system_flags_events(sysEventData)) {
+      if (sysEventData.m_reset == EResetOccured::RESET_OCCURED) {
+        m_deviceConfigured = false;
+        return;
+      }
+
       if (sysEventData.m_slide == ESlideEvent::SLIDE) {
         m_output.m_touchInteraction = ETouchInteraction::SLIDING_DETECTED;
       } else if (sysEventData.m_touch == ETouchEvent::TOUCH) {
@@ -91,17 +110,14 @@ class CIQS263DeviceHandler {
       m_output.m_touchInteraction = ETouchInteraction::NOT_AVAILABLE;
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    if (sysEventData.m_slide == ESlideEvent::SLIDE ||
+        sysEventData.m_touch == ETouchEvent::TOUCH) {
+      CSliderCoordinateData sliderData;
 
-    CSliderCoordinateData sliderData;
-
-    if (m_touchDevice->read_wheel_coordinates(sliderData)) {
-      if (sliderData.m_commState == ECommState::SUCCESS) {
+      if (m_touchDevice->read_wheel_coordinates(sliderData)) {
         m_output.m_coordinateState = ESliderCoordinates::AVAILABLE;
         m_output.m_sliderLevel = sliderData.m_sliderCoord;
       }
-    } else {
-      m_output.m_coordinateState = ESliderCoordinates::NOT_AVAILABLE;
     }
   }
 
@@ -112,7 +128,7 @@ class CIQS263DeviceHandler {
 
   bool m_deviceAvailable;
   bool m_deviceConfigured;
-};
+};  // namespace hw
 
 }  // namespace hw
 }  // namespace tic

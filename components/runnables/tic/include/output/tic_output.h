@@ -10,7 +10,6 @@ enum class EDeviceState {
   DEVICE_NOT_PRESENT = 0,
   DEVICE_ACTIVE_NOT_CONF,
   DEVICE_ACTIVE_CONFIGURED,
-  DEVICE_INITIALIZING
 };
 
 enum class ETouchInteraction {

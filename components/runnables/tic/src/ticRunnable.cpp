@@ -12,9 +12,11 @@ void CTICRunnable::attachOutputPorts(ticPort_p f_ticOutputPort) {
   m_ticOutputPort = f_ticOutputPort;
 }
 
-void CTICRunnable::init() { m_deviceHandler.configureDevice(); }
+void CTICRunnable::init() { m_deviceHandler.checkDeviceAvailability(); }
 
 void CTICRunnable::run() {
+  CTicOutput defaultOut;
+  m_output = defaultOut;
   m_deviceHandler.handleDeviceAndSetOutput();
   sendOutput();
 }

@@ -9,6 +9,8 @@ namespace runnable {
 namespace tic {
 namespace hw {
 
+static const std::string G_HW_TAG("[HW::TIC]");
+
 class IQS263B : public smooth::core::io::i2c::I2CMasterDevice {
  public:
   IQS263B(i2c_port_t port, uint8_t address, std::mutex& guard);
