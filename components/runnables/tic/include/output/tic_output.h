@@ -22,7 +22,7 @@ enum class ETouchInteraction {
   LONG_TOUCH_DETECTED_SETUP
 };
 
-enum class ESliderCoordinates { NOT_AVAILABLE = 0, AVAILABLE };
+enum class ECoordinateState { NOT_AVAILABLE = 0, AVAILABLE };
 
 class CTicOutput {
  public:
@@ -30,12 +30,12 @@ class CTicOutput {
       : m_funcState(ETICState::INACTIVE),
         m_deviceState(EDeviceState::DEVICE_NOT_PRESENT),
         m_touchInteraction(ETouchInteraction::NO_INTERACTION),
-        m_coordinateState(ESliderCoordinates::NOT_AVAILABLE),
+        m_coordinateState(ECoordinateState::NOT_AVAILABLE),
         m_sliderLevel(0U){};
   ETICState m_funcState;
   EDeviceState m_deviceState;
   ETouchInteraction m_touchInteraction;
-  ESliderCoordinates m_coordinateState;
+  ECoordinateState m_coordinateState;
   uint8_t m_sliderLevel;
 };
 

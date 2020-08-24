@@ -38,7 +38,9 @@ class CHWDelegate {
           setSafeStateHW();
         } else {
           m_pinEN.clr();
-          m_pinPWM.setDutyCycle(G_LOOKUP_DIM_TABLE[f_dataOut.m_dimLevel]);
+          if (f_dataOut.m_dimLevel > 0 && f_dataOut.m_dimLevel <= 100) {
+            m_pinPWM.setDutyCycle(G_LOOKUP_DIM_TABLE[f_dataOut.m_dimLevel - 1]);
+          }
         }
         break;
     }

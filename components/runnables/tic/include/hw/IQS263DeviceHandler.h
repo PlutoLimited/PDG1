@@ -72,7 +72,7 @@ class CIQS263DeviceHandler {
       m_output.m_funcState = ETICState::INACTIVE;
       m_output.m_deviceState = (EDeviceState::DEVICE_NOT_PRESENT),
       m_output.m_touchInteraction = (ETouchInteraction::NO_INTERACTION),
-      m_output.m_coordinateState = (ESliderCoordinates::NOT_AVAILABLE),
+      m_output.m_coordinateState = (ECoordinateState::NOT_AVAILABLE),
       m_output.m_sliderLevel = (0U);
       return;
     }
@@ -82,7 +82,7 @@ class CIQS263DeviceHandler {
       m_output.m_funcState = ETICState::INACTIVE;
       m_output.m_deviceState = (EDeviceState::DEVICE_ACTIVE_NOT_CONF),
       m_output.m_touchInteraction = (ETouchInteraction::NO_INTERACTION),
-      m_output.m_coordinateState = (ESliderCoordinates::NOT_AVAILABLE),
+      m_output.m_coordinateState = (ECoordinateState::NOT_AVAILABLE),
       m_output.m_sliderLevel = (0U);
       return;
     }
@@ -108,6 +108,8 @@ class CIQS263DeviceHandler {
       }
     } else {
       m_output.m_touchInteraction = ETouchInteraction::NOT_AVAILABLE;
+      // increase dead comms counter, if over threshold set device status to
+      // DEVICE_NOT_PRESENT
     }
 
     if (sysEventData.m_slide == ESlideEvent::SLIDE ||
@@ -115,8 +117,10 @@ class CIQS263DeviceHandler {
       CSliderCoordinateData sliderData;
 
       if (m_touchDevice->read_wheel_coordinates(sliderData)) {
-        m_output.m_coordinateState = ESliderCoordinates::AVAILABLE;
+        m_output.m_coordinateState = ECoordinateState::AVAILABLE;
         m_output.m_sliderLevel = sliderData.m_sliderCoord;
+      } else {  // increase dead comms counter, if over threshold set device
+                // status to DEVICE_NOT_PRESENT}
       }
     }
   }
@@ -128,8 +132,7 @@ class CIQS263DeviceHandler {
 
   bool m_deviceAvailable;
   bool m_deviceConfigured;
-};  // namespace hw
-
+};
 }  // namespace hw
 }  // namespace tic
 }  // namespace runnable

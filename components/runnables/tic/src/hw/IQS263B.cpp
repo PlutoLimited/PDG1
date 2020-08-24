@@ -12,7 +12,8 @@ namespace hw {
 
 // Constructor
 IQS263B::IQS263B(i2c_port_t port, uint8_t address, std::mutex& guard)
-    : smooth::core::io::i2c::I2CMasterDevice(port, address, guard) {}
+    : smooth::core::io::i2c::I2CMasterDevice(port, address, guard),
+      m_pinReadyOut{G_PIN_RDY, false, false, false, true} {}
 
 bool IQS263B::clr_reset_bit() {
   auto res = false;
