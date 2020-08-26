@@ -70,6 +70,9 @@ class TICTask : public smooth::core::Task {
     Log::info(
         G_TASK_TAG, stack_format, "Touch Interact.",
         std::to_string(static_cast<uint8_t>(ticOutput.m_touchInteraction)));
+    Log::info(
+        G_TASK_TAG, stack_format, "Coordinate State",
+        std::to_string(static_cast<uint8_t>(ticOutput.m_coordinateState)));
     Log::info(G_TASK_TAG, stack_format, "Slider Level",
               std::to_string(ticOutput.m_sliderLevel));
 

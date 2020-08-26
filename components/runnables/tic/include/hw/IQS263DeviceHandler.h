@@ -71,7 +71,7 @@ class CIQS263DeviceHandler {
       m_deviceAvailable = m_touchDevice->is_present();
       m_output.m_funcState = ETICState::INACTIVE;
       m_output.m_deviceState = (EDeviceState::DEVICE_NOT_PRESENT),
-      m_output.m_touchInteraction = (ETouchInteraction::NO_INTERACTION),
+      m_output.m_touchInteraction = (ETouchInteraction::NOT_AVAILABLE),
       m_output.m_coordinateState = (ECoordinateState::NOT_AVAILABLE),
       m_output.m_sliderLevel = (0U);
       return;
@@ -81,7 +81,7 @@ class CIQS263DeviceHandler {
 
       m_output.m_funcState = ETICState::INACTIVE;
       m_output.m_deviceState = (EDeviceState::DEVICE_ACTIVE_NOT_CONF),
-      m_output.m_touchInteraction = (ETouchInteraction::NO_INTERACTION),
+      m_output.m_touchInteraction = (ETouchInteraction::NOT_AVAILABLE),
       m_output.m_coordinateState = (ECoordinateState::NOT_AVAILABLE),
       m_output.m_sliderLevel = (0U);
       return;

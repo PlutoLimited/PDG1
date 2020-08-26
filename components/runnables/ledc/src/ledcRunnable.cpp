@@ -23,9 +23,17 @@ void CLEDCRunnable::attachOutputPorts(ledcPort_p f_ledcOutputPort) {
   m_ledcOutputPort = f_ledcOutputPort;
 }
 
-void CLEDCRunnable::collectInput() {}
+void CLEDCRunnable::collectInput() {
+  m_input.m_llcOutData = *(m_llcInputPort->getData());
+  m_input.m_ticOutData = *(m_ticInputPort->getData());
+}
 
-void CLEDCRunnable::doWork() {}
+void CLEDCRunnable::doWork() {
+  // handle lightlvl feedback
+  m_vfHandler.handleLightLvlFeedback();
+  // handle device status feedback
+  m_vfHandler.handleDeviceStatusFeedback();
+}
 
 void CLEDCRunnable::sendOutput() { m_ledcOutputPort->setData(m_output); }
 

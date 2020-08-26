@@ -14,7 +14,8 @@ static const std::string G_HW_TAG("[RUN::LLC::HW]");
 class CHWDelegate {
  public:
   CHWDelegate()
-      : m_pinEN{G_PIN_EN, true, false, false, true},
+      : m_pinEN{G_PIN_EN, false, false, false,
+                true},  // GPIO_MODE_INPUT_OUTPUT_OD
         m_pinPWM{G_PIN_PWM, true, false, false, true} {
     m_pinPWM.setupPwm(G_CHANNEL_PWM, G_PWM_RES_TIMER_BIT, G_PWM_FREQ_HZ);
     m_pinPWM.setDutyCycle(0U);

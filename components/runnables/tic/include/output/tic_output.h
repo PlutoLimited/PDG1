@@ -29,7 +29,7 @@ class CTicOutput {
   CTicOutput()
       : m_funcState(ETICState::INACTIVE),
         m_deviceState(EDeviceState::DEVICE_NOT_PRESENT),
-        m_touchInteraction(ETouchInteraction::NO_INTERACTION),
+        m_touchInteraction(ETouchInteraction::NOT_AVAILABLE),
         m_coordinateState(ECoordinateState::NOT_AVAILABLE),
         m_sliderLevel(0U){};
   ETICState m_funcState;
