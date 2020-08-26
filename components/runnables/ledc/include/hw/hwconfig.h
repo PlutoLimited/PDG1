@@ -22,6 +22,8 @@ static const auto G_PIN_LED_RGB_R1 = GPIO_NUM_32;
 static const auto G_PIN_LED_RGB_G1 = GPIO_NUM_33;
 static const auto G_PIN_LED_RGB_B1 = GPIO_NUM_12;
 
+static const auto G_PIN_VIB_HF_1 = GPIO_NUM_5;
+
 static const ledc_channel_t G_CHANNEL_R1_PWM = LEDC_CHANNEL_1;
 static const ledc_channel_t G_CHANNEL_G1_PWM = LEDC_CHANNEL_2;
 static const ledc_channel_t G_CHANNEL_B1_PWM = LEDC_CHANNEL_3;

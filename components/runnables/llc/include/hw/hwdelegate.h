@@ -22,7 +22,7 @@ class CHWDelegate {
   };
 
   void setSafeStateHW() {
-    m_pinEN.set();
+    m_pinEN.clr();
     m_pinPWM.setDutyCycle(0U);
   }
 
@@ -38,7 +38,7 @@ class CHWDelegate {
         if (f_dataOut.m_lightState == runnable::llc::ELightState::LIGHT_OFF) {
           setSafeStateHW();
         } else {
-          m_pinEN.clr();
+          m_pinEN.set();
           if (f_dataOut.m_dimLevel > 0 && f_dataOut.m_dimLevel <= 100) {
             m_pinPWM.setDutyCycle(G_LOOKUP_DIM_TABLE[f_dataOut.m_dimLevel - 1]);
           }

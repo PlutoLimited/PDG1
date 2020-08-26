@@ -31,7 +31,8 @@ class CHWDelegate {
         m_pinLED_R1{G_PIN_LED_RGB_R1, true, false, false, true},
         m_pinLED_G1{G_PIN_LED_RGB_G1, true, false, false, true},
         m_pinLED_B1{G_PIN_LED_RGB_B1, true, false, false, true},
-        m_rgb_arr_p{&m_pinLED_R1, &m_pinLED_G1, &m_pinLED_B1} {
+        m_rgb_arr_p{&m_pinLED_R1, &m_pinLED_G1, &m_pinLED_B1},
+        m_pinHF1{G_PIN_VIB_HF_1, true, false, false, true} {
     m_pinLED_R1.setupPwm(G_CHANNEL_R1_PWM, G_PWM_RES_TIMER_BIT, G_PWM_FREQ_HZ);
     m_pinLED_R1.setDutyCycle(0U);
 
@@ -40,6 +41,10 @@ class CHWDelegate {
 
     m_pinLED_B1.setupPwm(G_CHANNEL_B1_PWM, G_PWM_RES_TIMER_BIT, G_PWM_FREQ_HZ);
     m_pinLED_B1.setDutyCycle(0U);
+
+    setLEDOffState();
+    setRGBOffState();
+    setHFOffState();
   };
 
   void setLEDOffState() {
@@ -104,6 +109,8 @@ class CHWDelegate {
     m_rgb_arr_p[2]->setDutyCycle(b_scaled);
   }
 
+  void setHFOffState() { m_pinHF1.clr(); }
+
  private:
   smooth::core::io::Output m_pinLED1;   // active high
   smooth::core::io::Output m_pinLED2;   // active high
@@ -120,6 +127,7 @@ class CHWDelegate {
   smooth::core::io::Output m_pinLED_G1;  // active high,pwm
   smooth::core::io::Output m_pinLED_B1;  // active high,pwm
   smooth::core::io::Output* m_rgb_arr_p[3];
+  smooth::core::io::Output m_pinHF1;  // active high,pwm
 };
 
 }  // namespace hw
