@@ -39,6 +39,10 @@ void App::init() {
   m_LEDCtask.attachInputDataPorts(&m_llcOutputData, &m_ticOutputData);
   m_LEDCtask.attachOutputDataPorts(&m_ledcOutputData);
   m_LEDCtask.start();
+
+  m_DCMtask.attachInputDataPorts(&m_ticOutputData);
+  m_DCMtask.attachOutputDataPorts(&m_dcmOutputData);
+  m_DCMtask.start();
 }
 
 void App::tick() { smooth::core::SystemStatistics::instance().dump(); }
