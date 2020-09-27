@@ -11,6 +11,7 @@ file(TO_CMAKE_PATH "$ENV{IDF_PATH}" normalized_path)
                                 ${CMAKE_CURRENT_LIST_DIR}
                             REQUIRES
                                 smooth_component
+                                wifi_provisioning
                                 tasks
                                 runnables)
 

@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "handler/wifiHandler.h"
 #include "input/dcm_input.h"
 #include "memport.h"
 #include "output/dcm_output.h"
@@ -19,7 +20,12 @@ using dcmPort_p = tinymemport::TDataPort<runnable::dcm::output::CDCMOutput> *;
 
 class CDCMRunnable : public CRunnable {
  public:
-  CDCMRunnable() : m_ticInputPort(), m_dcmOutputPort(), m_input(), m_output() {}
+  CDCMRunnable()
+      : m_ticInputPort(),
+        m_dcmOutputPort(),
+        m_input(),
+        m_output(),
+        m_handler(m_input, m_output) {}
 
   void init() override;
   void run() override;
@@ -33,6 +39,7 @@ class CDCMRunnable : public CRunnable {
 
   runnable::dcm::input::CDCMInput m_input;
   runnable::dcm::output::CDCMOutput m_output;
+  runnable::dcm::handler::CWifiHandler m_handler;
 
   void collectInput();
   void doWork();

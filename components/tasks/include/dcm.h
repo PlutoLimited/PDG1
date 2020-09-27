@@ -22,7 +22,7 @@ class DCMTask : public smooth::core::Task {
   explicit DCMTask()
       : smooth::core::Task("TASK::DCM", 9000,
                            smooth::core::APPLICATION_BASE_PRIO,
-                           std::chrono::milliseconds{20}),
+                           std::chrono::milliseconds{50}),
         m_ticInputPort(),
         m_dcmOutputPort(),
         m_dcmRunnable(),
@@ -58,7 +58,9 @@ class DCMTask : public smooth::core::Task {
   runnable::dcm::CDCMRunnable m_dcmRunnable;
   uint8_t m_logCounter;
 
-  void printOutputData() {}
+  void printOutputData() {
+    // TODO: print output debug information
+  }
 };
 }  // namespace dcm
 }  // namespace tasks
