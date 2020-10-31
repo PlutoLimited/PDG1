@@ -16,6 +16,9 @@ static const auto G_PIN_SDA = GPIO_NUM_21;
 static const auto G_PIN_RDY = GPIO_NUM_13;
 static const uint32_t G_I2C_FREQ = 100000U;
 
+// long touch threshold
+static const uint8_t G_LONG_TOUCH_SETUP = 100U;
+
 // device address
 static const uint8_t G_IQS263_ADDR = 0x44;
 // registers

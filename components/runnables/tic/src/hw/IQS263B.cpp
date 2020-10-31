@@ -16,6 +16,9 @@ IQS263B::IQS263B(i2c_port_t port, uint8_t address, std::mutex& guard)
       m_pinReadyOut{G_PIN_RDY, false, false, false, true} {}
 
 bool IQS263B::clr_reset_bit() {
+  m_pinReadyOut.set();
+  std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
   auto res = false;
   for (uint8_t i = 0; i < 30; i++) {
     res = write(address, G_WRITE_CLEAR_RESET_DATA);
@@ -24,17 +27,25 @@ bool IQS263B::clr_reset_bit() {
       break;
     }
   }
+  m_pinReadyOut.clr();
   return res;
 }
 
 bool IQS263B::configure_device() {
+  m_pinReadyOut.set();
+  std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
   bool res = write(address, G_WRITE_DEVICE_PROX_CONFIG_DATA);
+  m_pinReadyOut.clr();
   return res;
 }
 
 bool IQS263B::read_wheel_coordinates(CSliderCoordinateData& f_sliderDataOut) {
   CSliderCoordinateData defaultData;
   f_sliderDataOut = defaultData;
+
+  m_pinReadyOut.set();
+  std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
   smooth::core::util::FixedBuffer<uint8_t, 1> data;
   auto res = false;
@@ -46,11 +57,13 @@ bool IQS263B::read_wheel_coordinates(CSliderCoordinateData& f_sliderDataOut) {
     }
   }
   if (!res) {
+    m_pinReadyOut.clr();
     return res;
   }
   Log::info(G_HW_TAG, "SLIDER COORDINATES --- {}", data[0]);
   f_sliderDataOut.m_commState = ECommState::SUCCESS;
   f_sliderDataOut.m_sliderCoord = data[0];
+  m_pinReadyOut.clr();
   return res;
 }
 
@@ -58,6 +71,9 @@ bool IQS263B::read_system_flags_events(
     CSystemFlagsEventsData& f_sysEventDataOut) {
   CSystemFlagsEventsData defaultData;
   f_sysEventDataOut = defaultData;
+
+  m_pinReadyOut.set();
+  std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
   smooth::core::util::FixedBuffer<uint8_t, 2> data;
   auto res = false;
@@ -70,6 +86,7 @@ bool IQS263B::read_system_flags_events(
   }
 
   if (!res) {
+    m_pinReadyOut.clr();
     return res;
   }
 
@@ -111,6 +128,7 @@ bool IQS263B::read_system_flags_events(
     f_sysEventDataOut.m_prox = EProxEvent::NO_PROX;
   }
 
+  m_pinReadyOut.clr();
   return res;
 }
 

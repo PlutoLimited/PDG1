@@ -29,7 +29,8 @@ class CIQS263DeviceHandler {
                      hw::G_I2C_FREQ),  // clock frequency - 100kHz
         m_touchDevice(),
         m_deviceAvailable(false),
-        m_deviceConfigured(false) {
+        m_deviceConfigured(false),
+        m_touchConsCnt(0U) {
     m_touchDevice = m_i2c_master.create_device<hw::IQS263B>(hw::G_IQS263_ADDR);
   }
 
@@ -68,6 +69,7 @@ class CIQS263DeviceHandler {
 
   void handleDeviceAndSetOutput() {
     if (!m_deviceAvailable) {
+      m_touchConsCnt = 0U;
       m_deviceAvailable = m_touchDevice->is_present();
       m_output.m_funcState = ETICState::INACTIVE;
       m_output.m_deviceState = (EDeviceState::DEVICE_NOT_PRESENT),
@@ -78,7 +80,7 @@ class CIQS263DeviceHandler {
     }
     if (!m_deviceConfigured) {
       configureDevice();
-
+      m_touchConsCnt = 0U;
       m_output.m_funcState = ETICState::INACTIVE;
       m_output.m_deviceState = (EDeviceState::DEVICE_ACTIVE_NOT_CONF),
       m_output.m_touchInteraction = (ETouchInteraction::NOT_AVAILABLE),
@@ -94,20 +96,34 @@ class CIQS263DeviceHandler {
     if (m_touchDevice->read_system_flags_events(sysEventData)) {
       if (sysEventData.m_reset == EResetOccured::RESET_OCCURED) {
         m_deviceConfigured = false;
+        m_touchConsCnt = 0U;
         return;
       }
 
       if (sysEventData.m_slide == ESlideEvent::SLIDE) {
         m_output.m_touchInteraction = ETouchInteraction::SLIDING_DETECTED;
+        m_touchConsCnt++;
+        if (m_touchConsCnt >= G_LONG_TOUCH_SETUP) {
+          m_output.m_touchInteraction =
+              ETouchInteraction::LONG_TOUCH_DETECTED_SETUP;
+        }
       } else if (sysEventData.m_touch == ETouchEvent::TOUCH) {
         m_output.m_touchInteraction = ETouchInteraction::TOUCH_DETECTED;
+        m_touchConsCnt++;
+        if (m_touchConsCnt >= G_LONG_TOUCH_SETUP) {
+          m_output.m_touchInteraction =
+              ETouchInteraction::LONG_TOUCH_DETECTED_SETUP;
+        }
       } else if (sysEventData.m_prox == EProxEvent::PROX) {
         m_output.m_touchInteraction = ETouchInteraction::PROXIMITY_DETECTED;
+        m_touchConsCnt = 0U;
       } else {
         m_output.m_touchInteraction = ETouchInteraction::NO_INTERACTION;
+        m_touchConsCnt = 0U;
       }
     } else {
       m_output.m_touchInteraction = ETouchInteraction::NOT_AVAILABLE;
+      m_touchConsCnt = 0U;
       // increase dead comms counter, if over threshold set device status to
       // DEVICE_NOT_PRESENT
     }
@@ -115,7 +131,6 @@ class CIQS263DeviceHandler {
     if (sysEventData.m_slide == ESlideEvent::SLIDE ||
         sysEventData.m_touch == ETouchEvent::TOUCH) {
       CSliderCoordinateData sliderData;
-
       if (m_touchDevice->read_wheel_coordinates(sliderData)) {
         m_output.m_coordinateState = ECoordinateState::AVAILABLE;
         m_output.m_sliderLevel = sliderData.m_sliderCoord;
@@ -132,6 +147,7 @@ class CIQS263DeviceHandler {
 
   bool m_deviceAvailable;
   bool m_deviceConfigured;
+  uint32_t m_touchConsCnt;
 };
 }  // namespace hw
 }  // namespace tic
