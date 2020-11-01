@@ -17,15 +17,14 @@ IQS263B::IQS263B(i2c_port_t port, uint8_t address, std::mutex& guard)
 
 bool IQS263B::clr_reset_bit() {
   m_pinReadyOut.set();
-  std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
   auto res = false;
   for (uint8_t i = 0; i < 30; i++) {
     res = write(address, G_WRITE_CLEAR_RESET_DATA);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
     if (res) {
       break;
     }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
   m_pinReadyOut.clr();
   return res;
@@ -33,9 +32,15 @@ bool IQS263B::clr_reset_bit() {
 
 bool IQS263B::configure_device() {
   m_pinReadyOut.set();
-  std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-  bool res = write(address, G_WRITE_DEVICE_PROX_CONFIG_DATA);
+  bool res(false);
+  for (uint8_t i = 0; i < 10; i++) {
+    res = write(address, G_WRITE_DEVICE_PROX_CONFIG_DATA);
+    if (res) {
+      break;
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }
   m_pinReadyOut.clr();
   return res;
 }
@@ -45,16 +50,15 @@ bool IQS263B::read_wheel_coordinates(CSliderCoordinateData& f_sliderDataOut) {
   f_sliderDataOut = defaultData;
 
   m_pinReadyOut.set();
-  std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
   smooth::core::util::FixedBuffer<uint8_t, 1> data;
   auto res = false;
   for (uint8_t i = 0; i < 30; i++) {
     res = read(address, G_REG_WHEEL_COORDINATES, data);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
     if (res) {
       break;
     }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
   if (!res) {
     m_pinReadyOut.clr();
@@ -73,16 +77,15 @@ bool IQS263B::read_system_flags_events(
   f_sysEventDataOut = defaultData;
 
   m_pinReadyOut.set();
-  std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
   smooth::core::util::FixedBuffer<uint8_t, 2> data;
   auto res = false;
   for (uint8_t i = 0; i < 30; i++) {
     res = read(address, G_REG_SYSTEM_FLAGS_EVENTS, data, true, true);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
     if (res) {
       break;
     }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
   if (!res) {

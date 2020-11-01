@@ -22,7 +22,7 @@ class DCMTask : public smooth::core::Task {
   explicit DCMTask()
       : smooth::core::Task("TASK::DCM", 9000,
                            smooth::core::APPLICATION_BASE_PRIO,
-                           std::chrono::milliseconds{50}),
+                           std::chrono::milliseconds{500}),
         m_ticInputPort(),
         m_dcmOutputPort(),
         m_dcmRunnable(),
@@ -46,7 +46,7 @@ class DCMTask : public smooth::core::Task {
   void tick() override {
     m_dcmRunnable.run();
     m_logCounter++;
-    if (m_logCounter % 100 == 0U) {
+    if (m_logCounter % 10 == 0U) {
       printOutputData();
     }
   }
@@ -59,7 +59,14 @@ class DCMTask : public smooth::core::Task {
   uint8_t m_logCounter;
 
   void printOutputData() {
-    // TODO: print output debug information
+    const auto dcmOutput = *(m_dcmOutputPort->getData());
+    constexpr const char *stack_format = "{:>16} | {:>10}";
+    Log::info(G_TASK_TAG, stack_format, "Signal", "Value");
+    Log::info(G_TASK_TAG, stack_format, "Function State",
+              std::to_string(static_cast<uint8_t>(dcmOutput.m_funcState)));
+    Log::info(G_TASK_TAG, stack_format, "DCM State",
+              std::to_string(static_cast<uint8_t>(dcmOutput.m_connState)));
+    Log::info(G_TASK_TAG, "");
   }
 };
 }  // namespace dcm

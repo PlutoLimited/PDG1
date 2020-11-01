@@ -26,7 +26,7 @@ void CDCMRunnable::collectInput() {
   m_input.m_ticData = *(m_ticInputPort->getData());
 }
 
-void CDCMRunnable::doWork() {}
+void CDCMRunnable::doWork() { m_handler.handle(); }
 
 void CDCMRunnable::sendOutput() { m_dcmOutputPort->setData(m_output); }
 
