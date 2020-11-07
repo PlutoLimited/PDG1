@@ -17,6 +17,11 @@ void CDCMRunnable::attachInputPorts(ticPort_p f_ticInputPort) {
   m_ticInputPort = f_ticInputPort;
 }
 
+void CDCMRunnable::attachWifi(wifiInstance_p f_wifi) {
+  Log::info(G_TASK_TAG, "Attaching wifi instance");
+  m_wifi_p = f_wifi;
+}
+
 void CDCMRunnable::attachOutputPorts(dcmPort_p f_dcmOutputPort) {
   Log::info(G_TASK_TAG, "Attaching output ports");
   m_dcmOutputPort = f_dcmOutputPort;

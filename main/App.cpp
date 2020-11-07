@@ -42,6 +42,7 @@ void App::init() {
 
   m_DCMtask.attachInputDataPorts(&m_ticOutputData);
   m_DCMtask.attachOutputDataPorts(&m_dcmOutputData);
+  m_DCMtask.attachWifi(&get_wifi());
   m_DCMtask.start();
 }
 
