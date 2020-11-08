@@ -27,7 +27,7 @@ class CDCMRunnable : public CRunnable {
         m_dcmOutputPort(),
         m_input(),
         m_output(),
-        m_handler(m_input, m_output, m_wifi_p) {}
+        m_wifiHandler(m_input, m_output, m_wifi_p) {}
 
   void init() override;
   void run() override;
@@ -43,7 +43,7 @@ class CDCMRunnable : public CRunnable {
 
   runnable::dcm::input::CDCMInput m_input;
   runnable::dcm::output::CDCMOutput m_output;
-  runnable::dcm::handler::CWifiHandler m_handler;
+  runnable::dcm::handler::CWifiHandler m_wifiHandler;
 
   void collectInput();
   void doWork();

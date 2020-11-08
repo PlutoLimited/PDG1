@@ -43,6 +43,7 @@ class DCMTask : public smooth::core::Task {
   void init() override {
     Log::info(G_TASK_TAG, "DCM task init");
     m_dcmRunnable.attachInputPorts(m_ticInputPort);
+    m_dcmRunnable.attachWifi(m_wifi);
     m_dcmRunnable.attachOutputPorts(m_dcmOutputPort);
     m_dcmRunnable.init();
   }

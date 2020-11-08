@@ -14,75 +14,82 @@
 #include "smooth/core/task_priorities.h"
 #include "wificonfig.h"
 
-// ToDo don't use those namespaces per default
-// using namespace smooth;
-// using namespace smooth::core;
-using namespace smooth::core::json;
-using namespace smooth::core::timer;
-using namespace smooth::core::ipc;
 using namespace smooth::core::filesystem;
 
 namespace runnable {
 namespace dcm {
 namespace wifi {
 
-static const std::string G_HW_TAG("[RUN::DCM::DELEGATE]");
+static const std::string G_TAG("[RUN::DCM::WIFI]");
 
 class CWifiDelegate {
  public:
   CWifiDelegate(smooth::core::network::Wifi*& f_wifi_p) : m_wifi_p(f_wifi_p){};
 
-  void initWifi() { m_wifi.set_auto_connect(true); }
+  void initWifi() {
+    m_wifi_p->set_auto_connect(true);
+    getCredentials();
+  }
 
   void turnOffWifi() {}
 
-  void connectAP() { m_wifi.connect_to_ap(); }
+  void connectAP() { m_wifi_p->connect_to_ap(); }
 
-  bool isConnectedAP() { return m_wifi.is_connected_to_ap(); }
+  bool isConnectedAP() { return m_wifi_p->is_connected_to_ap(); }
 
-  bool isProvActive() { return m_wifi.is_provisioning_ble(); }
+  bool isProvActive() { return m_wifi_p->is_provisioning_ble(); }
 
-  bool isProvFinishedSuccess() { return m_wifi.is_should_save_creds(); }
+  bool isProvFinishedSuccess() { return m_wifi_p->is_should_save_creds(); }
 
-  bool isProvFinishedFail() { return m_wifi.is_prov_fail(); }
+  bool isProvFinishedFail() { return m_wifi_p->is_provisioning_failed(); }
 
-  bool isConfigured() { return m_wifi.is_configured(); }
+  bool isConfigured() { return m_wifi_p->is_configured(); }
 
-  void startBLProvisioning() { m_wifi.start_ble_provisioning(); }
+  void startBLProvisioning() { m_wifi_p->start_ble_provisioning(); }
 
   void saveCredentials() {
-    SPIFlash flash{FlashMount::instance(), "app_storage", 10, true};
+    SPIFlash flash{FlashMount::instance(), G_PARTITION_NAME, G_MAX_NO_FILES,
+                   true};
     assert(flash.mount());
 
-    unlink(FlashMount::instance().mount_point() / "credentials.jsn");
-    JsonFile jf{FlashMount::instance().mount_point() / "credentials.jsn"};
+    // unlink(FlashMount::instance().mount_point() / G_FILE_NAME);
+    smooth::core::json::JsonFile jf{FlashMount::instance().mount_point() /
+                                    G_FILE_NAME};
     auto& v = jf.value();
-    v["ssid"] = m_wifi.ssid;
-    v["pwd"] = m_wifi.password;
+    v[G_KEY_WIFI] = m_wifi_p->ssid;
+    v[G_KEY_PWD] = m_wifi_p->password;
     assert(jf.save());
 
-    m_wifi.setCredentialsSaved();
+    m_wifi_p->setCredentialsSaved();
     flash.unmount();
   }
 
   void getCredentials() {
-    SPIFlash flash{FlashMount::instance(), "app_storage", 10, true};
+    SPIFlash flash{FlashMount::instance(), G_PARTITION_NAME, G_MAX_NO_FILES,
+                   true};
     assert(flash.mount());
 
-    JsonFile jf2{FlashMount::instance().mount_point() / "credentials.jsn"};
+    smooth::core::json::JsonFile jf2{FlashMount::instance().mount_point() /
+                                     G_FILE_NAME};
     auto& v2 = jf2.value();
-    const auto ssid = v2["ssid"].get<std::string>();
-    const auto pwd = v2["pwd"].get<std::string>();
-    unlink(FlashMount::instance().mount_point() / "credentials.json");
-    if (ssid.length() > 0U) {
-      m_wifi.set_ap_credentials(ssid, pwd);
+
+    if (!v2[G_KEY_WIFI].is_null() && !v2[G_KEY_PWD].is_null()) {
+      const auto ssid = v2[G_KEY_WIFI].get<std::string>();
+      const auto pwd = v2[G_KEY_PWD].get<std::string>();
+      Log::info(G_TAG, "Credentials are fetched and exist");
+      // unlink(FlashMount::instance().mount_point() / G_FILE_NAME); DONT DELETE
+      if (ssid.length() > 0U) {
+        Log::info(G_TAG, "Credentials are fetched and valid");
+        m_wifi_p->set_ap_credentials(ssid, pwd);
+      }
+    } else {
+      Log::error(G_TAG, "Credentials null");
     }
     flash.unmount();
   }
 
  private:
   smooth::core::network::Wifi*& m_wifi_p;
-  smooth::core::network::Wifi m_wifi;
 };
 
 }  // namespace wifi

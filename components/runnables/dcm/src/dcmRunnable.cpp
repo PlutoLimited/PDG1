@@ -4,12 +4,21 @@
 namespace runnable {
 namespace dcm {
 
-void CDCMRunnable::init() {}
+void CDCMRunnable::init() {
+  assert(m_ticInputPort != nullptr);
+  assert(m_dcmOutputPort != nullptr);
+  assert(m_wifi_p != nullptr);
+
+  m_wifiHandler.init();
+}
 
 void CDCMRunnable::run() {
-  collectInput();
-  doWork();
-  sendOutput();
+  if ((m_ticInputPort != nullptr) && (m_dcmOutputPort != nullptr) &&
+      (m_wifi_p != nullptr)) {
+    collectInput();
+    doWork();
+    sendOutput();
+  }
 }
 
 void CDCMRunnable::attachInputPorts(ticPort_p f_ticInputPort) {
@@ -31,7 +40,10 @@ void CDCMRunnable::collectInput() {
   m_input.m_ticData = *(m_ticInputPort->getData());
 }
 
-void CDCMRunnable::doWork() { m_handler.handle(); }
+void CDCMRunnable::doWork() {
+  m_output = output::CDCMOutput();
+  m_wifiHandler.handle();
+}
 
 void CDCMRunnable::sendOutput() { m_dcmOutputPort->setData(m_output); }
 

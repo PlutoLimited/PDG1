@@ -20,8 +20,11 @@ class CWifiHandler {
                smooth::core::network::Wifi*& f_wifi_p_r)
       : m_input(f_inputData),
         m_output(f_outputData),
-        m_wifiDelegate(f_wifi_p_r) {
-    m_wifiDelegate.getCredentials();
+        m_wifiDelegate(f_wifi_p_r) {}
+
+  void init() {
+    m_output.m_funcState = dcm::output::EDCMState::ACTIVE;
+    m_output.m_connState = dcm::output::EConnectionState::WIFI_OFF;
     m_wifiDelegate.initWifi();
   }
 
