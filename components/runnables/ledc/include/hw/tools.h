@@ -1,3 +1,5 @@
+#pragma once
+
 typedef struct {
   double r;  // a fraction between 0 and 1
   double g;  // a fraction between 0 and 1
@@ -109,3 +111,59 @@ rgb hsv2rgb(hsv in) {
   }
   return out;
 }
+
+class CPulseBrightness {
+ public:
+  CPulseBrightness(const uint16_t f_period, const uint16_t f_numPulses,
+                   const float f_pt1_beta)
+      : m_counter(0U),
+        m_counterPulses(0U),
+        prevState(false),
+        m_durationCycles(f_period),
+        m_numPulses(f_numPulses),
+        m_beta(f_pt1_beta),
+        m_prevBrightness(0.F){};
+
+  void reset() {
+    m_counter = 0U;
+    prevState = false;
+    m_prevBrightness = 0U;
+  }
+
+  bool hasFinished() { return (m_counterPulses >= m_numPulses); }
+
+  bool isActive() { return (m_counter != 0U); }
+
+  float runAndGetBrightness() {
+    if (m_counter % m_durationCycles == 0U) {
+      prevState = !prevState;
+      m_counterPulses++;
+    }
+    m_counter++;
+
+    if (!prevState) {
+      float setpoint = 0.F;
+
+      m_prevBrightness =
+          (m_prevBrightness - (m_beta * (m_prevBrightness - setpoint)));
+
+      return m_prevBrightness;
+    } else {
+      float setpoint = 1.F;
+
+      m_prevBrightness =
+          (m_prevBrightness - (m_beta * (m_prevBrightness - setpoint)));
+
+      return m_prevBrightness;
+    }
+  }
+
+ private:
+  uint16_t m_counter;
+  uint16_t m_counterPulses;
+  bool prevState;
+  const uint16_t m_durationCycles;
+  const uint16_t m_numPulses;
+  const float m_beta;
+  float m_prevBrightness;
+};

@@ -36,7 +36,8 @@ void App::init() {
   m_TICtask.attachOutputDataPorts(&m_ticOutputData);
   m_TICtask.start();
 
-  m_LEDCtask.attachInputDataPorts(&m_llcOutputData, &m_ticOutputData);
+  m_LEDCtask.attachInputDataPorts(&m_llcOutputData, &m_ticOutputData,
+                                  &m_dcmOutputData);
   m_LEDCtask.attachOutputDataPorts(&m_ledcOutputData);
   m_LEDCtask.start();
 

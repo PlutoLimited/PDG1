@@ -1,5 +1,6 @@
 #pragma once
 
+#include "algo/algoconfig.h"
 #include "hwconfig.h"
 #include "output/ledc_output.h"
 #include "runnable.h"
@@ -31,7 +32,13 @@ class CHWDelegate {
         m_pinLED_R1{G_PIN_LED_12_RED, true, false, false, true},
         m_pinLED_G1{G_PIN_LED_11_GREEN, true, false, false, true},
         m_rg_arr_p{&m_pinLED_R1, &m_pinLED_G1},
-        m_pinHF1{G_PIN_VIB_HF_1, true, false, false, true} {
+        m_pinHF1{G_PIN_VIB_HF_1, true, false, false, true},
+        m_statusSetupPulse(algo::G_LLF_BLINK_CYCLES, 9999U,
+                           algo::G_LLF_PULSE_BETA),
+        m_statusSetupFailed(algo::G_LLF_CONT_CYCLES, 2U,
+                            algo::G_LLF_PULSE_BETA),
+        m_statusSetupSuccessful(algo::G_LLF_CONT_CYCLES, 2U,
+                                algo::G_LLF_PULSE_BETA) {
     m_pinLED_R1.setupPwm(G_CHANNEL_R1_PWM, G_PWM_RES_TIMER_BIT, G_PWM_FREQ_HZ);
     m_pinLED_R1.setDutyCycle(0U);
 
@@ -39,7 +46,7 @@ class CHWDelegate {
     m_pinLED_G1.setDutyCycle(0U);
 
     setLEDOffState();
-    setRGBOffState();
+    setRGOffState();
     setHFOffState();
   };
 
@@ -84,20 +91,61 @@ class CHWDelegate {
 
   void setLEDProxAnim() {}
 
-  void setRGBOffState() {
+  void setDeviceDegradationAnim() {
+    // continuous red
+    setRGfromHSV(0.F, 1.F, 1.F);
+  }
+
+  void setDeviceSetupActiveAnim() {
+    const auto brightness = m_statusSetupPulse.runAndGetBrightness();
+    // pluto color pulsing
+    setRGfromHSV(51.F, 1.F, brightness);
+  }
+
+  bool isDeviceSetupFailedAnimActive() {
+    return (!m_statusSetupFailed.hasFinished() &&
+            m_statusSetupFailed.isActive());
+  }
+
+  void setDeviceSetupFailedAnim() {
+    const auto brightness = m_statusSetupFailed.runAndGetBrightness();
+    // pluto color pulsing
+    setRGfromHSV(0.F, 1.F, brightness);
+  }
+
+  bool isDeviceSetupSuccessAnimActive() {
+    return (!m_statusSetupSuccessful.hasFinished() &&
+            m_statusSetupSuccessful.isActive());
+  }
+
+  void setDeviceSetupSuccessAnim() {
+    const auto brightness = m_statusSetupSuccessful.runAndGetBrightness();
+    // pluto color pulsing
+    setRGfromHSV(120.F, 1.F, brightness);
+  }
+
+  void resetRGAnims() {
+    m_statusSetupSuccessful.reset();
+    m_statusSetupFailed.reset();
+    m_statusSetupPulse.reset();
+  }
+
+  void setRGOffState() {
+    resetRGAnims();
     for (uint8_t i = 0; i < std::size(m_rg_arr_p); i++) {
       m_rg_arr_p[i]->clr();
+      m_rg_arr_p[i]->setDutyCycle(0U);
     }
   }
   // hue in deg, saturation, brightness range [0,1]
-  void setRGBfromHSV(const float f_hue, const float f_saturation,
-                     const float f_brightness) {
+  void setRGfromHSV(const float f_hue, const float f_saturation,
+                    const float f_brightness) {
     hsv in{f_hue, f_saturation, f_brightness};
     rgb out;
     out = hsv2rgb(in);
     // needs to be scaled to [0,255]
-    uint8_t r_scaled = uint8_t(out.r * 255.F);
-    uint8_t g_scaled = uint8_t(out.g * 255.F);
+    uint8_t r_scaled = uint8_t(out.r * 254.F);
+    uint8_t g_scaled = uint8_t(out.g * 254.F);
     // uint8_t b_scaled = uint8_t(out.b * 255.F);
 
     m_rg_arr_p[0]->setDutyCycle(r_scaled);
@@ -122,6 +170,10 @@ class CHWDelegate {
   smooth::core::io::Output m_pinLED_G1;  // active high,pwm
   smooth::core::io::Output* m_rg_arr_p[2];
   smooth::core::io::Output m_pinHF1;  // active high,pwm
+
+  CPulseBrightness m_statusSetupPulse;
+  CPulseBrightness m_statusSetupFailed;
+  CPulseBrightness m_statusSetupSuccessful;
 };
 
 }  // namespace hw

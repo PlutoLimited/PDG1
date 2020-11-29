@@ -27,8 +27,8 @@ class CWifiDelegate {
   CWifiDelegate(smooth::core::network::Wifi*& f_wifi_p) : m_wifi_p(f_wifi_p){};
 
   void initWifi() {
-    m_wifi_p->set_auto_connect(true);
     getCredentials();
+    m_wifi_p->set_auto_connect(true);
   }
 
   void turnOffWifi() {}

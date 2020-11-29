@@ -16,6 +16,12 @@ static const auto G_PIN_SDA = GPIO_NUM_21;
 static const auto G_PIN_RDY = GPIO_NUM_13;
 static const uint32_t G_I2C_FREQ = 100000U;
 
+// minimum acceptable lower touch coordinate, ignore otherwise
+static const uint8_t G_MIN_VALID_WHEEL_COORD = 10U;
+
+// maximum acceptable upper touch coordinate, ignore otherwise
+static const uint8_t G_MAX_VALID_WHEEL_COORD = 175U;
+
 // long touch threshold
 static const uint8_t G_LONG_TOUCH_SETUP = 100U;
 

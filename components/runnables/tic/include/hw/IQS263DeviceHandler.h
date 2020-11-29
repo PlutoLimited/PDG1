@@ -132,10 +132,18 @@ class CIQS263DeviceHandler {
         sysEventData.m_touch == ETouchEvent::TOUCH) {
       CSliderCoordinateData sliderData;
       if (m_touchDevice->read_wheel_coordinates(sliderData)) {
-        m_output.m_coordinateState = ECoordinateState::AVAILABLE;
-        m_output.m_sliderLevel = sliderData.m_sliderCoord;
-      } else {  // increase dead comms counter, if over threshold set device
-                // status to DEVICE_NOT_PRESENT}
+        // make sure slider coords are within allowed range to prevent
+        // wraparound max/min switching
+        if ((sliderData.m_sliderCoord >= hw::G_MIN_VALID_WHEEL_COORD) &&
+            (sliderData.m_sliderCoord <= hw::G_MAX_VALID_WHEEL_COORD)) {
+          m_output.m_coordinateState = ECoordinateState::AVAILABLE;
+          m_output.m_sliderLevel = sliderData.m_sliderCoord;
+        } else {
+          // do nothing
+        }
+      } else {
+        // increase dead comms counter, if over threshold set device
+        // status to DEVICE_NOT_PRESENT}
       }
     }
   }

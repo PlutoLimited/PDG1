@@ -34,47 +34,48 @@ void CLLCRunnable::collectInput() {
 
 void CLLCRunnable::doWork() {
   // handle tic function state
-  switch (m_inputDataTIC.m_funcState) {
-    case runnable::tic::ETICState::INACTIVE:
-      // set output safe state
+  if (m_inputDataTIC.m_funcState == runnable::tic::ETICState::INACTIVE) {
+    // set output safe state
+    setSafeStateOutput();
+    return;
+  }
+
+  if (m_inputDataTIC.m_funcState == runnable::tic::ETICState::DEGRADED) {
+    // set output safe state
+    setSafeStateOutput();
+    return;
+  }
+
+  if (m_inputDataTIC.m_funcState == runnable::tic::ETICState::ACTIVE) {
+    if (m_inputDataTIC.m_deviceState !=
+        runnable::tic::EDeviceState::DEVICE_ACTIVE_CONFIGURED) {
+      // go to safe state since critical device not active
       setSafeStateOutput();
-      break;
+      return;
+    }
 
-    case runnable::tic::ETICState::ACTIVE:
-      // set llc output
-      if (m_inputDataTIC.m_deviceState ==
-          runnable::tic::EDeviceState::DEVICE_ACTIVE_CONFIGURED) {
-        m_output.m_funcState = ELLCState::ACTIVE;
-        if (m_inputDataTIC.m_touchInteraction ==
-                runnable::tic::ETouchInteraction::SLIDING_DETECTED ||
-            m_inputDataTIC.m_touchInteraction ==
-                runnable::tic::ETouchInteraction::TOUCH_DETECTED) {
-          // get slider coord.
-          if (m_inputDataTIC.m_coordinateState ==
-              runnable::tic::ECoordinateState::AVAILABLE) {
-            // set a new setpoint
-            setNewSetpointFromSlider();
-          } else {
-            // keep previous output
-            m_output.m_lightState = m_prevOutput.m_lightState;
-            m_output.m_dimLevel = m_prevOutput.m_dimLevel;
-          }
+    m_output.m_funcState = ELLCState::ACTIVE;
 
-        } else {
-          // keep previous output
-          m_output.m_lightState = m_prevOutput.m_lightState;
-          m_output.m_dimLevel = m_prevOutput.m_dimLevel;
-        }
+    if (m_inputDataTIC.m_touchInteraction ==
+            runnable::tic::ETouchInteraction::SLIDING_DETECTED ||
+        m_inputDataTIC.m_touchInteraction ==
+            runnable::tic::ETouchInteraction::TOUCH_DETECTED) {
+      // get slider coord.
+      if (m_inputDataTIC.m_coordinateState ==
+          runnable::tic::ECoordinateState::AVAILABLE) {
+        // set a new setpoint
+        setNewSetpointFromSlider();
       } else {
-        // go to safe state since critical device not active
-        setSafeStateOutput();
+        // keep previous output
+        m_output.m_lightState = m_prevOutput.m_lightState;
+        m_output.m_dimLevel = m_prevOutput.m_dimLevel;
       }
-      break;
 
-    case runnable::tic::ETICState::DEGRADED:
-      // set llc safe state
-      setSafeStateOutput();
-      break;
+    } else {
+      // keep previous output
+      m_output.m_lightState = m_prevOutput.m_lightState;
+      m_output.m_dimLevel = m_prevOutput.m_dimLevel;
+    }
   }
 }
 
@@ -97,6 +98,7 @@ void CLLCRunnable::setSafeStateOutput() {
 void CLLCRunnable::setNewSetpointFromSlider() {
   const uint8_t setpoint =
       convertSliderCoordToLLCSetpoint(m_inputDataTIC.m_sliderLevel);
+
   m_output.m_funcState = ELLCState::ACTIVE;
   m_output.m_lightState = setpointToLightState(setpoint);
   m_output.m_dimLevel = setpoint;

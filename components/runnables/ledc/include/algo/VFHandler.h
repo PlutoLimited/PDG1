@@ -28,7 +28,7 @@ class CVFHandler {
   void handleLightLvlFeedback() {
     if (!isLLCFuncStatePermissible()) {
       m_HWDelegate.setLEDOffState();
-      m_output.m_funcState = runnable::ledc::ELEDCState::INACTIVE;
+      m_output.m_funcState = runnable::ledc::ELEDCState::ACTIVE;
       m_output.m_ledState = runnable::ledc::ELedState::LED_OFF;
       return;
     }
@@ -48,7 +48,67 @@ class CVFHandler {
     m_storage.m_prevLLCLevel = m_input.m_llcOutData.m_dimLevel;
   }
 
-  void handleDeviceStatusFeedback() {}
+  void handleDeviceStatusFeedback() {
+    m_output.m_funcState = runnable::ledc::ELEDCState::ACTIVE;
+    // if device degradation happened, indicate error
+    if (!isLLCFuncStatePermissible()) {
+      m_output.m_ledState = runnable::ledc::ELedState::LED_ERROR_INDICATION;
+      m_HWDelegate.setDeviceDegradationAnim();
+      return;
+    }
+
+    // if device setup currently in progress, indicate
+    if (m_input.m_dcmOutData.m_connState ==
+        runnable::dcm::output::EConnectionState::PROV_BLE_ACTIVE) {
+      m_output.m_ledState =
+          runnable::ledc::ELedState::LED_DEVICE_SETUP_ACTIVE_INDICATION;
+      m_HWDelegate.setDeviceSetupActiveAnim();
+      return;
+    }
+
+    // if any setup-related animation is currently happening, proceed until
+    // finished
+    if (m_HWDelegate.isDeviceSetupSuccessAnimActive()) {
+      m_output.m_ledState =
+          runnable::ledc::ELedState::LED_DEVICE_SETUP_DONE_SUCCESS_INDICATION;
+      m_HWDelegate.setDeviceSetupSuccessAnim();
+      if (!m_HWDelegate.isDeviceSetupSuccessAnimActive()) {
+        m_HWDelegate.resetRGAnims();
+      }
+      return;
+    }
+
+    if (m_HWDelegate.isDeviceSetupFailedAnimActive()) {
+      m_output.m_ledState =
+          runnable::ledc::ELedState::LED_DEVICE_SETUP_DONE_FAIL_INDICATION;
+      m_HWDelegate.setDeviceSetupFailedAnim();
+      if (!m_HWDelegate.isDeviceSetupFailedAnimActive()) {
+        m_HWDelegate.resetRGAnims();
+      }
+      return;
+    }
+
+    // if device setup failed, start animation
+    if (m_input.m_dcmOutData.m_connState ==
+        runnable::dcm::output::EConnectionState::PROV_BLE_FAIL) {
+      m_output.m_ledState =
+          runnable::ledc::ELedState::LED_DEVICE_SETUP_DONE_FAIL_INDICATION;
+      m_HWDelegate.setDeviceSetupFailedAnim();
+      return;
+    }
+
+    // if device setup successful, start animation
+    if (m_input.m_dcmOutData.m_connState ==
+        runnable::dcm::output::EConnectionState::PROV_BLE_SUCCESS) {
+      m_output.m_ledState =
+          runnable::ledc::ELedState::LED_DEVICE_SETUP_DONE_SUCCESS_INDICATION;
+      m_HWDelegate.setDeviceSetupSuccessAnim();
+      return;
+    }
+
+    // status indicator off
+    m_HWDelegate.setRGOffState();
+  }
 
  private:
   runnable::ledc::ELedState handleLightOnLlf() {
@@ -72,8 +132,29 @@ class CVFHandler {
           return runnable::ledc::ELedState::LED_LIGHT_LVL_INDICATION;
         }
       } else {
-        m_HWDelegate.setLEDOffState();
-        return runnable::ledc::ELedState::LED_OFF;
+        // here may be the place for proximity indication logic
+        if (isKeepAliveCounterActiveProximity()) {
+          m_storage.m_keepAliveCounterValue++;
+          if (m_storage.m_keepAliveCounterValue >= G_LLF_DURATION_CYCLES) {
+            endKeepAliveCounter();
+            m_HWDelegate.setLEDOffState();
+            return runnable::ledc::ELedState::LED_OFF;
+          } else {
+            m_HWDelegate.setConsecLEDOnLvl(
+                dimLevelToLLFLeds(m_input.m_llcOutData.m_dimLevel));
+            return runnable::ledc::ELedState::LED_PROXIMITY_INDICATION;
+          }
+        } else {
+          if (isTICInteractionProximity()) {
+            startKeepAliveCounterProx();
+            m_HWDelegate.setConsecLEDOnLvl(
+                dimLevelToLLFLeds(m_input.m_llcOutData.m_dimLevel));
+            return runnable::ledc::ELedState::LED_PROXIMITY_INDICATION;
+          } else {
+            m_HWDelegate.setLEDOffState();
+            return runnable::ledc::ELedState::LED_OFF;
+          }
+        }
       }
     }
   }
@@ -99,8 +180,29 @@ class CVFHandler {
           return runnable::ledc::ELedState::LED_LIGHT_LVL_INDICATION;
         }
       } else {
-        m_HWDelegate.setLEDOffState();
-        return runnable::ledc::ELedState::LED_OFF;
+        // here may be the place for proximity indication logic
+        if (isKeepAliveCounterActiveProximity()) {
+          m_storage.m_keepAliveCounterValue++;
+          if (m_storage.m_keepAliveCounterValue >= G_LLF_DURATION_CYCLES) {
+            endKeepAliveCounter();
+            m_HWDelegate.setLEDOffState();
+            return runnable::ledc::ELedState::LED_OFF;
+          } else {
+            m_HWDelegate.setConsecLEDOnLvl(
+                dimLevelToLLFLeds(m_input.m_llcOutData.m_dimLevel));
+            return runnable::ledc::ELedState::LED_PROXIMITY_INDICATION;
+          }
+        } else {
+          if (isTICInteractionProximity()) {
+            startKeepAliveCounterProx();
+            m_HWDelegate.setConsecLEDOnLvl(
+                dimLevelToLLFLeds(m_input.m_llcOutData.m_dimLevel));
+            return runnable::ledc::ELedState::LED_PROXIMITY_INDICATION;
+          } else {
+            m_HWDelegate.setLEDOffState();
+            return runnable::ledc::ELedState::LED_OFF;
+          }
+        }
       }
     }
   }
