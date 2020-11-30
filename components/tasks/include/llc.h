@@ -23,7 +23,7 @@ class LLCTask : public smooth::core::Task {
   explicit LLCTask()
       : smooth::core::Task("TASK::LLC", 9000,
                            smooth::core::APPLICATION_BASE_PRIO,
-                           std::chrono::milliseconds{20}),
+                           std::chrono::milliseconds{80}),
         m_ticInputPort(),
         m_llcOutputPort(),
         m_llcRunnable(),

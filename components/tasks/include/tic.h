@@ -19,7 +19,7 @@ class TICTask : public smooth::core::Task {
   TICTask()
       : smooth::core::Task("TASK::TIC", 9000,
                            smooth::core::APPLICATION_BASE_PRIO,
-                           std::chrono::milliseconds{50}),
+                           std::chrono::milliseconds{80}),
         m_ticOutputPort(),
         m_ticRunnable(),
         m_logCounter(0U) {}

@@ -20,7 +20,9 @@ class CWifiHandler {
                smooth::core::network::Wifi*& f_wifi_p_r)
       : m_input(f_inputData),
         m_output(f_outputData),
-        m_wifiDelegate(f_wifi_p_r) {}
+        m_wifiDelegate(f_wifi_p_r),
+        m_cyclesAfterProvCounter(0U),
+        m_cyclesProvActiveCounter(0U) {}
 
   void init() {
     m_output.m_funcState = dcm::output::EDCMState::ACTIVE;
@@ -34,18 +36,40 @@ class CWifiHandler {
     // prov process active, do nothing
     if (m_wifiDelegate.isProvActive()) {
       m_output.m_connState = dcm::output::EConnectionState::PROV_BLE_ACTIVE;
+      if (m_cyclesProvActiveCounter >= wifi::G_PROV_TIMEOUT_CYCLES) {
+        // end provisioning
+        m_wifiDelegate.endBLProvisioning();
+      }
+
+      m_cyclesProvActiveCounter++;
       return;
     }
 
-    if (m_wifiDelegate.isProvFinishedSuccess()) {
-      m_wifiDelegate.saveCredentials();
-      m_output.m_connState = dcm::output::EConnectionState::PROV_BLE_SUCCESS;
-      return;
-    }
+    if (m_wifiDelegate.isProvEnded()) {
+      if (m_wifiDelegate.isProvSuccessful()) {
+        if (m_wifiDelegate.shouldSaveCreds()) {
+          m_wifiDelegate.saveCredentials();
+        }
+        m_output.m_connState = dcm::output::EConnectionState::PROV_BLE_SUCCESS;
 
-    if (m_wifiDelegate.isProvFinishedFail()) {
-      m_output.m_connState = dcm::output::EConnectionState::PROV_BLE_FAIL;
-      return;
+        if (m_cyclesAfterProvCounter >= wifi::G_PROV_FEEDBACK_TIMEOUT_CYCLES) {
+          // restart device
+          esp_restart();
+        }
+
+        m_cyclesAfterProvCounter++;
+        return;
+      } else {
+        m_output.m_connState = dcm::output::EConnectionState::PROV_BLE_FAIL;
+
+        if (m_cyclesAfterProvCounter >= wifi::G_PROV_FEEDBACK_TIMEOUT_CYCLES) {
+          // restart device
+          esp_restart();
+        }
+
+        m_cyclesAfterProvCounter++;
+        return;
+      }
     }
 
     // on long touch and is not setup --> setup
@@ -82,6 +106,8 @@ class CWifiHandler {
   runnable::dcm::input::CDCMInput& m_input;
   runnable::dcm::output::CDCMOutput& m_output;
   wifi::CWifiDelegate m_wifiDelegate;
+  uint8_t m_cyclesAfterProvCounter;
+  uint16_t m_cyclesProvActiveCounter;
 };
 }  // namespace handler
 }  // namespace dcm

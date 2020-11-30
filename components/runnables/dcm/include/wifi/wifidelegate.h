@@ -39,13 +39,17 @@ class CWifiDelegate {
 
   bool isProvActive() { return m_wifi_p->is_provisioning_ble(); }
 
-  bool isProvFinishedSuccess() { return m_wifi_p->is_should_save_creds(); }
+  bool isProvSuccessful() { return m_wifi_p->is_prov_success(); }
 
-  bool isProvFinishedFail() { return m_wifi_p->is_provisioning_failed(); }
+  bool isProvEnded() { return m_wifi_p->is_prov_ended(); }
+
+  bool shouldSaveCreds() { return m_wifi_p->is_should_save_creds(); }
 
   bool isConfigured() { return m_wifi_p->is_configured(); }
 
   void startBLProvisioning() { m_wifi_p->start_ble_provisioning(); }
+
+  void endBLProvisioning() { m_wifi_p->end_ble_provisioning(); }
 
   void saveCredentials() {
     SPIFlash flash{FlashMount::instance(), G_PARTITION_NAME, G_MAX_NO_FILES,
