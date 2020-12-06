@@ -1,5 +1,6 @@
 #pragma once
 
+#include "handler/awsHandler.h"
 #include "input/dcm_input.h"
 #include "output/dcm_output.h"
 #include "output/tic_output.h"

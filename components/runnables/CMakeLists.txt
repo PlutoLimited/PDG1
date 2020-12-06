@@ -4,4 +4,9 @@ idf_component_register(SRCS "llc/src/llcRunnable.cpp" "ledc/src/ledcRunnable.cpp
                     ${CMAKE_CURRENT_LIST_DIR}/../../externals/tinymemport/include
                     REQUIRES
                     smooth_component
+                    esp-aws-iot
                     )
+
+target_add_binary_data(${COMPONENT_TARGET} "certs/aws-root-ca.pem" TEXT)
+target_add_binary_data(${COMPONENT_TARGET} "certs/certificate.pem.crt" TEXT)
+target_add_binary_data(${COMPONENT_TARGET} "certs/private.pem.key" TEXT)    
