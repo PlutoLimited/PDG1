@@ -1,18 +1,17 @@
 #pragma once
 
-#include "handler/awsHandler.h"
+#include "delegate/wifi/wifidelegate.h"
 #include "input/dcm_input.h"
 #include "output/dcm_output.h"
 #include "output/tic_output.h"
 #include "runnable.h"
 #include "smooth/core/Application.h"
-#include "wifi/wifidelegate.h"
 
 namespace runnable {
 namespace dcm {
 namespace handler {
 
-static const std::string G_TASK_TAG("[RUN::DCM::HANDLER]");
+static const std::string G_TASK_TAG_WIFI("[RUN::DCM::HANDLER::WIFI]");
 
 class CWifiHandler {
  public:

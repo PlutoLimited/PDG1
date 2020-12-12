@@ -5,8 +5,12 @@ idf_component_register(SRCS "llc/src/llcRunnable.cpp" "ledc/src/ledcRunnable.cpp
                     REQUIRES
                     smooth_component
                     esp-aws-iot
+                    esp_https_ota
                     )
 
 target_add_binary_data(${COMPONENT_TARGET} "certs/aws-root-ca.pem" TEXT)
 target_add_binary_data(${COMPONENT_TARGET} "certs/certificate.pem.crt" TEXT)
 target_add_binary_data(${COMPONENT_TARGET} "certs/private.pem.key" TEXT)    
+target_add_binary_data(${COMPONENT_TARGET} "certs/deviceid.txt" TEXT)
+target_add_binary_data(${COMPONENT_TARGET} "certs/endpoint.txt" TEXT)
+target_add_binary_data(${COMPONENT_TARGET} "certs/github_server.cert" TEXT)

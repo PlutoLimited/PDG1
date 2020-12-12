@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "handler/awsHandler.h"
+#include "handler/otaHandler.h"
 #include "handler/wifiHandler.h"
 #include "input/dcm_input.h"
 #include "memport.h"

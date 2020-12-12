@@ -12,6 +12,7 @@ file(TO_CMAKE_PATH "$ENV{IDF_PATH}" normalized_path)
                             REQUIRES
                                 smooth_component
                                 wifi_provisioning
+                                esp_https_ota
                                 tasks
                                 runnables)
 
