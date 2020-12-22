@@ -23,12 +23,11 @@ static const std::string G_TASK_TAG_AWS("[RUN::DCM::HANDLER::AWS]");
 
 class CAWSHandler {
  public:
-  CAWSHandler(runnable::dcm::input::CDCMInput &f_inputData,
+  CAWSHandler(const runnable::dcm::input::CDCMInput &f_inputData,
               runnable::dcm::output::CDCMOutput &f_outputData)
       : m_input(f_inputData), m_output(f_outputData) {}
 
   void init() {
-    m_output.m_funcState = dcm::output::EDCMState::ACTIVE;
     m_output.m_awsState = dcm::output::EAWSState::AWS_NOT_CONNECTED;
   }
 
@@ -37,12 +36,15 @@ class CAWSHandler {
       m_output.m_awsState = dcm::output::EAWSState::AWS_NOT_CONNECTED;
       return;
     }
+
+    // wifi is connected, ensure active aws connection
     m_output.m_awsState = dcm::output::EAWSState::AWS_NOT_CONNECTED;
   }
 
  private:
-  runnable::dcm::input::CDCMInput &m_input;
+  const runnable::dcm::input::CDCMInput &m_input;
   runnable::dcm::output::CDCMOutput &m_output;
+  // runnable::dcm::aws::
 };
 }  // namespace handler
 }  // namespace dcm

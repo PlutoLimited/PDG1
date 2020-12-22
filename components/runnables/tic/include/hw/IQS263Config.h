@@ -31,13 +31,16 @@ static const uint8_t G_IQS263_ADDR = 0x44;
 static const uint8_t G_REG_SYSTEM_FLAGS_EVENTS = 0x01;   // 2 bytes
 static const uint8_t G_REG_WHEEL_COORDINATES = 0x02;     // 3 bytes
 static const uint8_t G_REG_PROX_DEVICE_SETTINGS = 0x09;  // 5 bytes
-
+static const uint8_t G_REG_THRESHOLDS_SETTINGS = 0x0A;   // 8 bytes
 // write - configuration
 static std::vector<uint8_t> G_WRITE_CLEAR_RESET_DATA{G_REG_SYSTEM_FLAGS_EVENTS,
                                                      0x00};
 
 static std::vector<uint8_t> G_WRITE_DEVICE_PROX_CONFIG_DATA{
     G_REG_PROX_DEVICE_SETTINGS, 0x00, 0x19, 0x00, 0x00, 0xFF};
+
+static std::vector<uint8_t> G_WRITE_THRESHOLDS_CONFIG_DATA{
+    G_REG_THRESHOLDS_SETTINGS, 0x20, 0x10, 0x10, 0x10, 0x03, 0x00, 0x14, 0x04};
 
 // read - bitmasks
 enum class E_SYSTEM_FLAGS_BITMASK : uint8_t {

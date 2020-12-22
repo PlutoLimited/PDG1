@@ -17,7 +17,7 @@ static const uint32_t G_LOOKUP_DIM_TABLE[100] = {
     48,  49,  50,  51,  52,  53,  54,  55,  56,  57,  58,  59,  60,  61,  62,
     63,  64,  65,  66,  67,  68,  69,  70,  72,  74,  76,  78,  80,  83,  86,
     90,  100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230,
-    240, 250, 260, 270, 280, 290, 300, 310, 320, 1023};
+    240, 250, 260, 270, 280, 290, 300, 310, 320, 400};
 
 static const ledc_channel_t G_CHANNEL_PWM = LEDC_CHANNEL_0;
 static const ledc_timer_bit_t G_PWM_RES_TIMER_BIT = LEDC_TIMER_10_BIT;

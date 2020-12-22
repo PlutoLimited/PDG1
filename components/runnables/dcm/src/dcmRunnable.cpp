@@ -10,6 +10,8 @@ void CDCMRunnable::init() {
   assert(m_wifi_p != nullptr);
 
   m_wifiHandler.init();
+  m_AWSHandler.init();
+  m_OTAHandler.init();
 }
 
 void CDCMRunnable::run() {
@@ -42,7 +44,10 @@ void CDCMRunnable::collectInput() {
 
 void CDCMRunnable::doWork() {
   m_output = output::CDCMOutput();
+  m_output.m_funcState = dcm::output::EDCMState::ACTIVE;
   m_wifiHandler.handle();
+  m_AWSHandler.handle();
+  m_OTAHandler.handle();
 }
 
 void CDCMRunnable::sendOutput() { m_dcmOutputPort->setData(m_output); }

@@ -36,11 +36,25 @@ bool IQS263B::configure_device() {
   bool res(false);
   for (uint8_t i = 0; i < 10; i++) {
     res = write(address, G_WRITE_DEVICE_PROX_CONFIG_DATA);
+
     if (res) {
       break;
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
+
+  if (res) {
+    res = false;
+    for (uint8_t i = 0; i < 10; i++) {
+      res = write(address, G_WRITE_THRESHOLDS_CONFIG_DATA);
+
+      if (res) {
+        break;
+      }
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+  }
+
   m_pinReadyOut.clr();
   return res;
 }

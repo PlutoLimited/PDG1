@@ -14,26 +14,27 @@ static const std::string G_TASK_TAG_OTA("[RUN::DCM::HANDLER::OTA]");
 
 class COTAHandler {
  public:
-  COTAHandler(runnable::dcm::input::CDCMInput& f_inputData,
+  COTAHandler(const runnable::dcm::input::CDCMInput& f_inputData,
               runnable::dcm::output::CDCMOutput& f_outputData)
-      : m_input(f_inputData), m_output(f_outputData) {}
+      : m_input(f_inputData), m_output(f_outputData), m_otaDelegate() {}
 
   void init() {
-    m_output.m_funcState = dcm::output::EDCMState::ACTIVE;
     m_output.m_otaState = dcm::output::EOTAState::OTA_NOT_AVAILABLE;
   }
 
   void handle() {
+    m_output.m_otaState = dcm::output::EOTAState::OTA_NOT_AVAILABLE;
     if (m_output.m_connState != output::EConnectionState::WIFI_CONNECTED) {
-      m_output.m_otaState = dcm::output::EOTAState::OTA_NOT_AVAILABLE;
       return;
     }
-    m_output.m_otaState = dcm::output::EOTAState::OTA_NOT_AVAILABLE;
+
+    // wifi connected, check for OTA
   }
 
  private:
-  runnable::dcm::input::CDCMInput& m_input;
+  const runnable::dcm::input::CDCMInput& m_input;
   runnable::dcm::output::CDCMOutput& m_output;
+  runnable::dcm::ota::COTADelegate m_otaDelegate;
 };
 }  // namespace handler
 }  // namespace dcm
