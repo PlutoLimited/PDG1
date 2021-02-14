@@ -17,7 +17,8 @@ class CHWDelegate {
       : m_pinEN{G_PIN_EN, false, false, false,
                 true},  // GPIO_MODE_INPUT_OUTPUT_OD
         m_pinPWM{G_PIN_PWM, true, false, false, true},
-        m_prevDim(0U) {
+        m_prevDim(0U),
+        m_enableDelayCounter(0U) {
     m_pinPWM.setupPwm(G_CHANNEL_PWM, G_PWM_RES_TIMER_BIT, G_PWM_FREQ_HZ);
     m_pinPWM.setDutyCycle(0U);
   };
@@ -26,6 +27,7 @@ class CHWDelegate {
     m_pinEN.clr();
     m_pinPWM.setDutyCycle(0U);
     m_prevDim = 0U;
+    m_enableDelayCounter = 0U;
   }
 
   void setHW(const runnable::llc::CLlcOutput& f_dataOut) {
@@ -42,16 +44,13 @@ class CHWDelegate {
         } else {
           if (m_prevDim == 0U) {
             m_pinEN.set();
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            m_enableDelayCounter++;
           }
 
-          if (f_dataOut.m_dimLevel > 0 && f_dataOut.m_dimLevel <= 100) {
+          if (f_dataOut.m_dimLevel > 0 && f_dataOut.m_dimLevel <= 100 &&
+              m_enableDelayCounter > G_ENABLE_PWM_DELAY_CYCLES) {
             uint32_t setpoint = G_LOOKUP_DIM_TABLE[f_dataOut.m_dimLevel - 1];
             m_prevDim = f_dataOut.m_dimLevel;
-            // const auto diff = float(setpoint - m_prevPWM);
-            // m_prevPWM += uint32_t(
-            //     diff * (G_LPF_BETA_PT1 / (1.F + 0.08 * std::abs(diff))));
-
             m_pinPWM.setDutyCycle(setpoint);
           }
         }
@@ -63,6 +62,7 @@ class CHWDelegate {
   smooth::core::io::Output m_pinEN;   // active low
   smooth::core::io::Output m_pinPWM;  // active high
   uint8_t m_prevDim;
+  uint8_t m_enableDelayCounter;
 };
 }  // namespace hw
 }  // namespace llc

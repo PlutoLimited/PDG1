@@ -40,7 +40,7 @@ static std::vector<uint8_t> G_WRITE_DEVICE_PROX_CONFIG_DATA{
     G_REG_PROX_DEVICE_SETTINGS, 0x00, 0x19, 0x00, 0x00, 0xFF};
 
 static std::vector<uint8_t> G_WRITE_THRESHOLDS_CONFIG_DATA{
-    G_REG_THRESHOLDS_SETTINGS, 0x20, 0x10, 0x10, 0x10, 0x03, 0x00, 0x14, 0x04};
+    G_REG_THRESHOLDS_SETTINGS, 0x24, 0x10, 0x10, 0x10, 0x03, 0x00, 0x14, 0x04};
 
 // read - bitmasks
 enum class E_SYSTEM_FLAGS_BITMASK : uint8_t {
