@@ -25,7 +25,7 @@ class CAWSHandler {
  public:
   CAWSHandler(const runnable::dcm::input::CDCMInput &f_inputData,
               runnable::dcm::output::CDCMOutput &f_outputData)
-      : m_input(f_inputData), m_output(f_outputData) {}
+      : m_input(f_inputData), m_output(f_outputData), m_AWSinitialized(false) {}
 
   void init() {
     m_output.m_awsState = dcm::output::EAWSState::AWS_NOT_CONNECTED;
@@ -39,12 +39,21 @@ class CAWSHandler {
 
     // wifi is connected, ensure active aws connection
     m_output.m_awsState = dcm::output::EAWSState::AWS_NOT_CONNECTED;
+
+    if (!m_AWSinitialized) {
+      m_AWSinitialized = m_AWSdelegate.initAWS();
+      return;
+    }
+
+    m_AWSdelegate.runAWS();
+    m_output.m_awsState = dcm::output::EAWSState::AWS_CONNECTED;
   }
 
  private:
   const runnable::dcm::input::CDCMInput &m_input;
   runnable::dcm::output::CDCMOutput &m_output;
-  // runnable::dcm::aws::
+  runnable::dcm::aws::CAWSDelegate m_AWSdelegate;
+  bool m_AWSinitialized;
 };
 }  // namespace handler
 }  // namespace dcm

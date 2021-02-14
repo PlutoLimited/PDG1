@@ -11,6 +11,7 @@ static const char *TAG = "cloud";
 #define MAX_DESIRED_PARAM 2
 #define MAX_REPORTED_PARAM 3
 #define MAX_LENGTH_URL 256
+#define FW_VERSION "V1.0"
 
 /* The event group allows multiple bits for each event,
    but we only care about one event - are we connected

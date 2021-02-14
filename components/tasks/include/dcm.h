@@ -72,6 +72,8 @@ class DCMTask : public smooth::core::Task {
               std::to_string(static_cast<uint8_t>(dcmOutput.m_funcState)));
     Log::info(G_TASK_TAG, stack_format, "DCM State",
               std::to_string(static_cast<uint8_t>(dcmOutput.m_connState)));
+    Log::info(G_TASK_TAG, stack_format, "AWS State",
+              std::to_string(static_cast<uint8_t>(dcmOutput.m_awsState)));
     Log::info(G_TASK_TAG, "");
   }
 };
