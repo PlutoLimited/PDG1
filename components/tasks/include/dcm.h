@@ -5,6 +5,7 @@
 #include "dcmRunnable.h"
 #include "memport.h"
 #include "output/dcm_output.h"
+#include "output/llc_output.h"
 #include "output/tic_output.h"
 #include "smooth/core/Application.h"
 #include "smooth/core/network/Wifi.h"
@@ -17,6 +18,8 @@ static const std::string G_TASK_TAG("[TASK::DCM]");
 
 using dcmPort_p = tinymemport::TDataPort<runnable::dcm::output::CDCMOutput> *;
 using ticPort_p = tinymemport::TDataPort<runnable::tic::CTicOutput> *;
+using llcPort_p = tinymemport::TDataPort<runnable::llc::CLlcOutput> *;
+
 using wifiInstance_p = smooth::core::network::Wifi *;
 
 class DCMTask : public smooth::core::Task {
@@ -30,8 +33,10 @@ class DCMTask : public smooth::core::Task {
         m_dcmRunnable(),
         m_logCounter(0) {}
 
-  void attachInputDataPorts(ticPort_p f_ticInputPort) {
+  void attachInputDataPorts(ticPort_p f_ticInputPort,
+                            llcPort_p f_llcInputPort) {
     m_ticInputPort = f_ticInputPort;
+    m_llcInputPort = f_llcInputPort;
   }
 
   void attachWifi(wifiInstance_p f_wifi) { m_wifi = f_wifi; }
@@ -42,7 +47,7 @@ class DCMTask : public smooth::core::Task {
 
   void init() override {
     Log::info(G_TASK_TAG, "DCM task init");
-    m_dcmRunnable.attachInputPorts(m_ticInputPort);
+    m_dcmRunnable.attachInputPorts(m_ticInputPort, m_llcInputPort);
     m_dcmRunnable.attachWifi(m_wifi);
     m_dcmRunnable.attachOutputPorts(m_dcmOutputPort);
     m_dcmRunnable.init();
@@ -58,6 +63,7 @@ class DCMTask : public smooth::core::Task {
 
  private:
   ticPort_p m_ticInputPort;
+  llcPort_p m_llcInputPort;
   dcmPort_p m_dcmOutputPort;
   wifiInstance_p m_wifi;
 

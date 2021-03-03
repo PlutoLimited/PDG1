@@ -28,7 +28,7 @@ void App::init() {
 
   Log::info(G_APP_TAG, "Init Application Tasks");
 
-  m_LLCtask.attachInputDataPorts(&m_ticOutputData);
+  m_LLCtask.attachInputDataPorts(&m_ticOutputData, &m_dcmOutputData);
   m_LLCtask.attachOutputDataPorts(&m_llcOutputData);
   m_LLCtask.start();
 
@@ -41,7 +41,7 @@ void App::init() {
   m_LEDCtask.attachOutputDataPorts(&m_ledcOutputData);
   m_LEDCtask.start();
 
-  m_DCMtask.attachInputDataPorts(&m_ticOutputData);
+  m_DCMtask.attachInputDataPorts(&m_ticOutputData, &m_llcOutputData);
   m_DCMtask.attachOutputDataPorts(&m_dcmOutputData);
   m_DCMtask.attachWifi(&get_wifi());
   m_DCMtask.start();

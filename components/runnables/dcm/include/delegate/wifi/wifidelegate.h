@@ -31,8 +31,6 @@ class CWifiDelegate {
     m_wifi_p->set_auto_connect(true);
   }
 
-  void turnOffWifi() {}
-
   void connectAP() { m_wifi_p->connect_to_ap(); }
 
   bool isConnectedAP() { return m_wifi_p->is_connected_to_ap(); }

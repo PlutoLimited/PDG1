@@ -55,14 +55,14 @@ static const std::string G_TASK_TAG("[DCM::DEL::AWS]");
 
 class CAWSDelegate {
  public:
-  CAWSDelegate() : rc(FAILURE), light_state(0U) { initAWS(); }
+  CAWSDelegate() : rc(FAILURE) {}
 
   static void output_state_change_callback(const char *pJsonString,
                                            uint32_t JsonStringDataLen,
                                            jsonStruct_t *pContext) {
     if (pContext != NULL) {
-      uint8_t lightstate = *(uint8_t *)(pContext->pData);
-      ESP_LOGI(TAG, "Delta - Output state changed to %d", lightstate);
+      desired_light_state = *(uint8_t *)(pContext->pData);
+      ESP_LOGI(TAG, "Delta - Light state changed to %d", desired_light_state);
     }
   }
 
@@ -164,8 +164,8 @@ class CAWSDelegate {
     output_handler.cb = output_state_change_callback;
     output_handler.pData = &light_state;
     output_handler.dataLength = sizeof(light_state);
-    output_handler.pKey = "lightlevel";
-    output_handler.type = SHADOW_JSON_BOOL;
+    output_handler.pKey = "light_level";
+    output_handler.type = SHADOW_JSON_UINT8;
 
     char fw[sizeof(FW_VERSION)];
     strcpy(fw, FW_VERSION);
@@ -176,7 +176,7 @@ class CAWSDelegate {
   }
 
   bool initAWS() {
-    setupShadowHandles();
+    // setupShadowHandles();
     rc = FAILURE;
     ota_update_done = false;
 
@@ -217,6 +217,35 @@ class CAWSDelegate {
       return false;
     }
 
+    ota_handler.cb = ota_url_state_change_callback;
+    ota_handler.pData = &ota_url;
+    ota_handler.pKey = "ota_url";
+    ota_handler.dataLength = sizeof(ota_url);
+    ota_handler.type = SHADOW_JSON_STRING;
+    rc = aws_iot_shadow_register_delta(&mqttClient, &ota_handler);
+    if (SUCCESS != rc) {
+      ESP_LOGE(TAG, "Shadow Register OTA Delta Error");
+      return false;
+    }
+    output_handler.cb = output_state_change_callback;
+    output_handler.pData = &light_state;
+    output_handler.dataLength = sizeof(light_state);
+    output_handler.pKey = "light_level";
+    output_handler.type = SHADOW_JSON_UINT8;
+
+    rc = aws_iot_shadow_register_delta(&mqttClient, &output_handler);
+    if (SUCCESS != rc) {
+      ESP_LOGE(TAG, "Shadow Register State Delta Error %d", rc);
+      return false;
+    }
+
+    char fw[sizeof(FW_VERSION)];
+    strcpy(fw, FW_VERSION);
+    fw_handler.pData = &fw;
+    fw_handler.dataLength = sizeof(fw);
+    fw_handler.pKey = "fw_version";
+    fw_handler.type = SHADOW_JSON_STRING;
+
     strcpy(ota_url, "");
     desired_handles = reinterpret_cast<jsonStruct_t **>(
         malloc(MAX_DESIRED_PARAM * sizeof(jsonStruct_t *)));
@@ -233,19 +262,8 @@ class CAWSDelegate {
       free(desired_handles);
       return false;
     }
-
-    rc = aws_iot_shadow_register_delta(&mqttClient, &ota_handler);
-    if (SUCCESS != rc) {
-      ESP_LOGE(TAG, "Shadow Register OTA Delta Error");
-      return false;
-    }
-
-    rc = aws_iot_shadow_register_delta(&mqttClient, &output_handler);
-    if (SUCCESS != rc) {
-      ESP_LOGE(TAG, "Shadow Register State Delta Error %d", rc);
-      return false;
-    }
-
+    desired_count = 0;
+    reported_count = 0;
     // Report the initial values once
     reported_handles[reported_count++] = &fw_handler;
     reported_handles[reported_count++] = &output_handler;
@@ -286,7 +304,9 @@ class CAWSDelegate {
 
       if (reported_lightstate != light_state) {
         reported_handles[reported_count++] = &output_handler;
+        desired_handles[desired_count++] = &output_handler;
         reported_lightstate = light_state;
+        desired_light_state = light_state;
       }
 
       if (reported_count > 0 || desired_count > 0) {
@@ -295,6 +315,10 @@ class CAWSDelegate {
       }
     }
   }
+
+  void updateLightLevel(uint8_t f_lightlvl) { light_state = f_lightlvl; }
+
+  uint8_t getDesiredLightLevel() { return desired_light_state; }
 
  private:
   static bool shadowUpdateInProgress;
@@ -310,7 +334,8 @@ class CAWSDelegate {
 
   IoT_Error_t rc;
   AWS_IoT_Client mqttClient;
-  uint8_t light_state;
+  static uint8_t light_state;
+  static uint8_t desired_light_state;
   uint8_t reported_lightstate = 0;
   size_t desired_count = 0, reported_count = 0;
 };

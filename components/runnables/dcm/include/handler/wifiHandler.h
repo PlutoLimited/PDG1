@@ -89,6 +89,7 @@ class CWifiHandler {
       if (m_wifiDelegate.isConfigured()) {
         m_output.m_connState =
             dcm::output::EConnectionState::WIFI_NOT_CONNECTED_CONFIGURED;
+        m_wifiDelegate.initWifi();
         m_wifiDelegate.connectAP();
       } else {
         // only periodically

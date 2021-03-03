@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "dcmRunnable.h"
 #include "ledcRunnable.h"
 #include "llcRunnable.h"
 #include "memport.h"
@@ -17,6 +18,7 @@ static const std::string G_TASK_TAG("[TASK::LLC]");
 using ticPort_p = tinymemport::TDataPort<runnable::tic::CTicOutput> *;
 using llcPort_p = tinymemport::TDataPort<runnable::llc::CLlcOutput> *;
 using ledcPort_p = tinymemport::TDataPort<runnable::ledc::CLedcOutput> *;
+using dcmPort_p = tinymemport::TDataPort<runnable::dcm::output::CDCMOutput> *;
 
 class LLCTask : public smooth::core::Task {
  public:
@@ -25,12 +27,14 @@ class LLCTask : public smooth::core::Task {
                            smooth::core::APPLICATION_BASE_PRIO,
                            std::chrono::milliseconds{80}),
         m_ticInputPort(),
+        m_dcmInputPort(),
         m_llcOutputPort(),
         m_llcRunnable(),
         m_logCounter(0) {}
 
-  void attachInputDataPorts(ticPort_p f_ticInputPort) {
+  void attachInputDataPorts(ticPort_p f_ticInputPort, dcmPort_p f_dcmInputPort) {
     m_ticInputPort = f_ticInputPort;
+    m_dcmInputPort = f_dcmInputPort;
   }
 
   void attachOutputDataPorts(llcPort_p f_llcOutputPort) {
@@ -39,7 +43,7 @@ class LLCTask : public smooth::core::Task {
 
   void init() override {
     Log::info(G_TASK_TAG, "LLC task init");
-    m_llcRunnable.attachInputPorts(m_ticInputPort);
+    m_llcRunnable.attachInputPorts(m_ticInputPort, m_dcmInputPort);
     m_llcRunnable.attachOutputPorts(m_llcOutputPort);
     m_llcRunnable.init();
   }
@@ -54,6 +58,7 @@ class LLCTask : public smooth::core::Task {
 
  private:
   ticPort_p m_ticInputPort;
+  dcmPort_p m_dcmInputPort;
   llcPort_p m_llcOutputPort;
 
   runnable::llc::CLLCRunnable m_llcRunnable;

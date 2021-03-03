@@ -16,9 +16,11 @@ void CLLCRunnable::run() {
   sendOutput();
 }
 
-void CLLCRunnable::attachInputPorts(ticPort_p f_ticInputPort) {
+void CLLCRunnable::attachInputPorts(ticPort_p f_ticInputPort,
+                                    dcmPort_p f_dcmInputPort) {
   Log::info(G_TASK_TAG, "Attaching input ports");
   m_ticInputPort = f_ticInputPort;
+  m_dcmInputPort = f_dcmInputPort;
 }
 
 void CLLCRunnable::attachOutputPorts(llcPort_p f_llcOutputPort) {
@@ -27,27 +29,30 @@ void CLLCRunnable::attachOutputPorts(llcPort_p f_llcOutputPort) {
 }
 
 void CLLCRunnable::collectInput() {
-  m_inputDataTIC = *(m_ticInputPort->getData());
+  m_inputData.m_ticInput = *(m_ticInputPort->getData());
+  m_inputData.m_dcmInput = *(m_dcmInputPort->getData());
   CLlcOutput defaultOut;
   m_output = defaultOut;
 }
 
 void CLLCRunnable::doWork() {
   // handle tic function state
-  if (m_inputDataTIC.m_funcState == runnable::tic::ETICState::INACTIVE) {
+  if (m_inputData.m_ticInput.m_funcState ==
+      runnable::tic::ETICState::INACTIVE) {
     // set output safe state
     setSafeStateOutput();
     return;
   }
 
-  if (m_inputDataTIC.m_funcState == runnable::tic::ETICState::DEGRADED) {
+  if (m_inputData.m_ticInput.m_funcState ==
+      runnable::tic::ETICState::DEGRADED) {
     // set output safe state
     setSafeStateOutput();
     return;
   }
 
-  if (m_inputDataTIC.m_funcState == runnable::tic::ETICState::ACTIVE) {
-    if (m_inputDataTIC.m_deviceState !=
+  if (m_inputData.m_ticInput.m_funcState == runnable::tic::ETICState::ACTIVE) {
+    if (m_inputData.m_ticInput.m_deviceState !=
         runnable::tic::EDeviceState::DEVICE_ACTIVE_CONFIGURED) {
       // go to safe state since critical device not active
       setSafeStateOutput();
@@ -56,12 +61,12 @@ void CLLCRunnable::doWork() {
 
     m_output.m_funcState = ELLCState::ACTIVE;
 
-    if (m_inputDataTIC.m_touchInteraction ==
+    if (m_inputData.m_ticInput.m_touchInteraction ==
             runnable::tic::ETouchInteraction::SLIDING_DETECTED ||
-        m_inputDataTIC.m_touchInteraction ==
+        m_inputData.m_ticInput.m_touchInteraction ==
             runnable::tic::ETouchInteraction::TOUCH_DETECTED) {
       // get slider coord.
-      if (m_inputDataTIC.m_coordinateState ==
+      if (m_inputData.m_ticInput.m_coordinateState ==
           runnable::tic::ECoordinateState::AVAILABLE) {
         // set a new setpoint
         setNewSetpointFromSlider();
@@ -75,6 +80,13 @@ void CLLCRunnable::doWork() {
       // keep previous output
       m_output.m_lightState = m_prevOutput.m_lightState;
       m_output.m_dimLevel = m_prevOutput.m_dimLevel;
+
+      // check if aws request exists
+      if (m_inputData.m_dcmInput.m_awsDesiredLightLvl ==
+          runnable::dcm::output::EAWSDesiredLightState::NEW_LVL_DESIRED) {
+        m_output.m_dimLevel = m_inputData.m_dcmInput.m_desiredLvl;
+        m_output.m_lightState = setpointToLightState(m_output.m_dimLevel);
+      }
     }
   }
 }
@@ -97,7 +109,7 @@ void CLLCRunnable::setSafeStateOutput() {
 
 void CLLCRunnable::setNewSetpointFromSlider() {
   const uint8_t setpoint =
-      convertSliderCoordToLLCSetpoint(m_inputDataTIC.m_sliderLevel);
+      convertSliderCoordToLLCSetpoint(m_inputData.m_ticInput.m_sliderLevel);
 
   m_output.m_funcState = ELLCState::ACTIVE;
   m_output.m_lightState = setpointToLightState(setpoint);

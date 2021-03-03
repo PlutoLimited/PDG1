@@ -23,9 +23,11 @@ void CDCMRunnable::run() {
   }
 }
 
-void CDCMRunnable::attachInputPorts(ticPort_p f_ticInputPort) {
+void CDCMRunnable::attachInputPorts(ticPort_p f_ticInputPort,
+                                    llcPort_p f_llcInputPort) {
   Log::info(G_TASK_TAG, "Attaching input ports");
   m_ticInputPort = f_ticInputPort;
+  m_llcInputPort = f_llcInputPort;
 }
 
 void CDCMRunnable::attachWifi(wifiInstance_p f_wifi) {
@@ -40,11 +42,14 @@ void CDCMRunnable::attachOutputPorts(dcmPort_p f_dcmOutputPort) {
 
 void CDCMRunnable::collectInput() {
   m_input.m_ticData = *(m_ticInputPort->getData());
+  m_input.m_llcData = *(m_llcInputPort->getData());
 }
 
 void CDCMRunnable::doWork() {
   m_output = output::CDCMOutput();
   m_output.m_funcState = dcm::output::EDCMState::ACTIVE;
+  m_output.m_awsDesiredLightLvl =
+      dcm::output::EAWSDesiredLightState::NOT_DESIRED;
   m_wifiHandler.handle();
   m_AWSHandler.handle();
   m_OTAHandler.handle();
